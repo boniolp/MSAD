@@ -1,0 +1,7 @@
+here code for different models
+- feature-based,
+- Rocket
+- Conv
+- ResNet
+- Inception
+- Transformer

@@ -47,7 +47,7 @@ pip install -r requirements.txt
 We propose a benchmark and an evaluation of 16 time series classifiers used as model selection methods (with 12 anomaly detectors to be selected) applied on 16 datasets from different domains. Our pipeline can be summarized in the following figure.
 
 <p align="center">
-<img width="1000" src="./assets/figures_data/pipeline.jpg"/>
+<img width="1000" src="./assets/figures/pipeline.jpg"/>
 </p>
 
 In the following section, we describe the datasets, anomaly detectors, and time series classification methods considered in our benchmark and evaluation.

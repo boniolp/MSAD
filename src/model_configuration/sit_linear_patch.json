@@ -1,0 +1,22 @@
+{
+	"timeseries_size": 512,
+	"window_size": 16,
+	"in_channels":1,
+	"embedding_dim":256,
+	"num_layers":12,
+	"num_heads":8,
+	"qkv_bias":true,
+	"mlp_ratio":4.0,
+	"use_revised_ffn":false,
+	"dropout_rate":0.2,
+	"attn_dropout_rate":0.2,
+	"use_conv_patch":false,
+	"use_linear_patch":true,
+	"use_conv_stem":false,
+	"use_conv_stem_original":true,
+	"use_stem_scaled_relu":false,
+	"hidden_dims":null,
+	"cls_head":false,
+	"num_classes":12,
+	"representation_size":null
+}

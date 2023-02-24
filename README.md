@@ -138,7 +138,7 @@ We report in the following figure the average VUS-PR and inference time (i.e., p
 </p>
 
 This figure and many others comparisons are described (and reproductible) in [this notebook](TODO), summarized in [this document](TODO).
-The overall accuracy tables (for VUS-PR and AUC-PR) are [here](TODO), and the execution time tables (training, prediction, and inference) are [here](TODO).
+The overall accuracy tables (for VUS-PR and AUC-PR) are [here](https://github.com/boniolp/MSAD/tree/main/results/accuracy), and the execution time tables (training, prediction, and inference) are [here](https://github.com/boniolp/MSAD/tree/main/results/execution_time).
 
 
 ## Usage

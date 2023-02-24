@@ -76,9 +76,9 @@ Briefly, TSB-UAD includes the following datasets:
 |SMD (Server Machine Dataset)| is a 5-week-long dataset collected from a large Internet company. This dataset contains 3 groups of entities from 28 different machines.|
 |SVDB| includes 78 half-hour ECG recordings chosen to supplement the examples of  supraventricular arrhythmias in the MIT-BIH Arrhythmia Database.|
 
-You may find more details (and the references) in our [paper](https://www.paparrizos.org/papers/PaparrizosVLDB22a.pdf).
+You may find more details (and the references) in the TSB-UAD benchmark [paper](https://www.paparrizos.org/papers/PaparrizosVLDB22a.pdf).
 
-## Anomaly Detectors
+### Anomaly Detectors
 
 We use 12 anomaly detection methods proposed for univariate time series. the following table lists and describes the methods considered:
 
@@ -96,9 +96,9 @@ We use 12 anomaly detection methods proposed for univariate time series. the fol
 | CNN | This method build a non-linear relationship between current and previous time series (using convolutional Neural Network), and the outliers are detected by the deviation between the predicted and actual values. |
 |One-class Support Vector Machines (OCSVM)| This method fits the dataset to find the normal data's boundary. |
 
-You may find more details (and the references) in our [paper](https://www.paparrizos.org/papers/PaparrizosVLDB22b.pdf). In italics are methods that are available but not evaluated yet.
+You may find more details (and the references) in the TSB-UAD benchmark [paper](https://www.paparrizos.org/papers/PaparrizosVLDB22b.pdf).
 
-## Time Series Classification Algorithms
+### Time Series Classification Algorithms
 
 We consider 16 time series classification (TSC) algtorithms used as model selection. the following table lists and describes the methods considered:
 

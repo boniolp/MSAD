@@ -1,0 +1,6 @@
+{
+	"in_channels": 1,
+	"mid_channels":64,
+	"num_layers":3,
+	"num_pred_classes":12
+}

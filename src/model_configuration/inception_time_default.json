@@ -1,0 +1,9 @@
+{
+	"num_blocks":5, 
+	"in_channels":1, 
+	"out_channels":64,
+	"bottleneck_channels":32, 
+	"kernel_sizes":[10,20,40,80,160],
+	"use_residuals":true, 
+	"num_pred_classes":12
+}

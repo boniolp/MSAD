@@ -134,7 +134,7 @@ We consider 16 time series classification (TSC) algtorithms used as model select
 We report in the following figure the average VUS-PR and inference time (i.e., predicting the detector to run and running it) for all detectors, the Oracle (the theoretical best model selection methods, in white), the Averaging Ensembling (in green), and the best time series classification used as model selection (in red). 
 
 <p align="center">
-<img width="1000" src="./assets/figures/intro_fig.jpg"/>
+<img width="500" src="./assets/figures/intro_fig.jpg"/>
 </p>
 
 This figure and many others comparisons are described (and reproductible) in [this notebook](TODO), summarized in [this document](TODO).

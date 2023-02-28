@@ -11,15 +11,14 @@
 
 import argparse
 import os
-import pandas as pd
+# import pandas as pd
 import matplotlib.pyplot as plt
 from natsort import natsorted, ns
-import seaborn as sns
+# import seaborn as sns
 from tqdm import tqdm
 
 from models.model.oracle import Oracle
 from utils.metrics_loader import MetricsLoader
-# from utils.config import *
 
 
 def create_oracle(path, acc=1, randomness='true'):
@@ -45,13 +44,9 @@ def create_oracle(path, acc=1, randomness='true'):
 		name = randomness.upper() + '_' + 'ORACLE-' + acc_str
 		metricsloader.write(score, files_names, name, metric)
 
-
+'''
 def eval_oracle(path):
 	oracles = [os.path.join(path, x) for x in os.listdir(path) if 'ORACLE-' in x]
-	# first_oracle = pd.read_csv(os.path.join(path, 'ORACLE', 'AUC_PR.csv'), index_col=0)
-	# oracle_indexes = [x.replace(TSB_data_path+'/', '') for x in first_oracle.index.tolist()]
-	# first_oracle.index = oracle_indexes
-	# first_oracle = first_oracle.sort_index()
 
 	all_oracles = None
 	for oracle in oracles:
@@ -75,7 +70,7 @@ def eval_oracle(path):
 	plt.xticks(rotation=45)
 	plt.tight_layout()
 	plt.show()
-
+'''
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(

@@ -9,6 +9,10 @@
 #
 ########################################################################
 
+# Important paths
+TSB_data_path = "data/TSB/data/"
+TSB_metrics_path = "data/TSB/metrics/"
+TSB_scores_path = "data/TSB/scores/"
 
 # Detector
 detector_names = [

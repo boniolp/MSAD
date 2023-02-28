@@ -70,8 +70,10 @@ class DataLoader:
 				if not np.all(curr_data[0, 1] == curr_data[:, 1]):
 					x.append(curr_data[:, 0])
 					y.append(curr_data[:, 1])
-					fnames.append(fname.replace(self.data_path+'/', ''))
-
+					# Remove path from file name, keep dataset, time series name
+					fname = '/'.join(fname.split('/')[-2:])		
+					fnames.append(fname.replace(self.data_path, ''))
+					
 		return x, y, fnames
 
 

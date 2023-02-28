@@ -115,7 +115,7 @@ class ScoresLoader:
 # -----------------------------------------------------
 	
 	@jit
-	def compute_metric(self, labels, scores, metric, verbose=1):
+	def compute_metric(self, labels, scores, metric, verbose=1, n_jobs=1):
 		'''Computes desired metric for all labels and scores pairs.
 
 		:param labels: list of arrays each representing the labels of a timeseries/sample
@@ -133,8 +133,7 @@ class ScoresLoader:
 
 		if scores[0].ndim == 1 or scores[0].shape[-1] == 1:
 			args = [x + (metric,) for x in list(zip(labels, scores))]
-			pool = multiprocessing.Pool(10)
-			# results = pool.starmap(self.compute_single_sample, args)
+			pool = multiprocessing.Pool(n_jobs)
 
 			results = []
 			for result in tqdm(pool.istarmap(self.compute_single_sample, args), total=len(args)):

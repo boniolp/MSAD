@@ -94,7 +94,11 @@ class DataLoader:
 			pbar.set_description(f'Loading {name}')
 			
 			for fname in glob.glob(os.path.join(self.data_path, name, '*.csv')):
-				df_list.append(pd.read_csv(fname, index_col=0))
+				curr_df = pd.read_csv(fname, index_col=0)
+				curr_index = [os.path.join(name, x) for x in list(curr_df.index)]
+				curr_df.index = curr_index
+
+				df_list.append(curr_df)
 				
 		df = pd.concat(df_list)
 

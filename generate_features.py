@@ -37,7 +37,7 @@ def generate_features(path):
 	# Load datasets
 	dataloader = DataLoader(path)
 	datasets = dataloader.get_dataset_names()
-	df = dataloader.load_df(datasets[:13])
+	df = dataloader.load_df(datasets[:11])
 	
 	# Divide df
 	labels = df.pop("label")

@@ -42,9 +42,9 @@ class DataLoader:
 
 	def load(self, dataset):
 		'''
-		Loads specified and returns 'datasets'
+		Loads the specified datasets
 
-		:param dataset: single dataset or list of datasets
+		:param dataset: list of datasets
 		:return x: timeseries
 		:return y: corresponding labels
 		:return fnames: list of names of the timeseries loaded
@@ -75,6 +75,30 @@ class DataLoader:
 					fnames.append(fname.replace(self.data_path, ''))
 					
 		return x, y, fnames
+
+
+	def load_df(self, dataset):
+		'''
+		Loads the time series of the given datasets and returns a dataframe
+
+		:param dataset: list of datasets
+		:return df: a single dataframe of all loaded time series
+		'''
+		df_list = []
+		pbar = tqdm(dataset)
+
+		if not isinstance(dataset, list):
+			raise ValueError('only accepts list of str')
+
+		for name in pbar:
+			pbar.set_description(f'Loading {name}')
+			
+			for fname in glob.glob(os.path.join(self.data_path, name, '*.csv')):
+				df_list.append(pd.read_csv(fname, index_col=0))
+				
+		df = pd.concat(df_list)
+
+		return df
 
 
 	def load_timeseries(self, timeseries):

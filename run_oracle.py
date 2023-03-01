@@ -81,7 +81,7 @@ if __name__ == "__main__":
 	parser.add_argument('-p', '--path', type=str, required=True,
 		help='Path to metrics'
 	)
-	parser.add_argument('-a', '--acc', type=str, default=1.0, 
+	parser.add_argument('-a', '--acc', type=float, default=1.0, 
 		help='The accuracy that you want to simulate'
 	)
 	parser.add_argument('-r', '--randomness', type=str, default='true',
@@ -93,7 +93,7 @@ if __name__ == "__main__":
 	if args.acc != 'all':
 		create_oracle(
 			path=args.path, 
-			acc=int(args.acc), 
+			acc=args.acc, 
 			randomness=args.randomness
 		)
 	elif args.acc == 'all':
@@ -107,4 +107,4 @@ if __name__ == "__main__":
 		)
 
 	# Evaluate with boxplot
-	eval_oracle(path=args.path)
+	# eval_oracle(path=args.path)

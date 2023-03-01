@@ -57,9 +57,14 @@ class ScoresLoader:
 
 	def load(self, file_names):
 		'''
-		Load the score for the specified files/timeseries
+		Load the score for the specified files/timeseries. If a time series has no score for all 
+		the detectors (e.g. the anomaly score has been computed for 10/12 detectors) the this
+		time series is skipped. Its index is returned in the idx_failed for the user to remove 
+		it from any other places if needed.
 
 		:param dataset: list of files
+		:return scores: the loaded scores
+		:return idx_failed: list with indexes of not loaded time series
 		'''
 		detectors = self.get_detector_names()
 		scores = []
@@ -164,31 +169,37 @@ class ScoresLoader:
 
 		tick = time.process_time()
 		result = np.apply_along_axis(self.compute_single_metric, 0, score, label, metric)
-		# result = parallel_apply_along_axis(self.compute_single_metric, 0, score, label, metric)
-		# print(type(result), result.shape)
-
-		# fig, ax = plt.subplots(3, 4, figsize=(15, 10))
-		# best = np.argmax(result)
-		# x = np.linspace(0, label.shape[0], label.shape[0])
-		# for i, axis in enumerate(ax):
-		# 	for j, axs in enumerate(axis):
-		# 		if i*4 + j == best:
-		# 			axs.patch.set_alpha(0.3)
-		# 			axs.patch.set_facecolor('green')
-		# 		axs.title.set_text('{:.1f}%'.format(result[i*4 + j]*100))
-		# 		axs.set_xlim([0, x[-1]])
-		# 		axs.set_ylim([0, 1])
-		# 		axs.plot(label, label='label', color='k', linewidth=2)
-		# 		axs.plot(score[:, i*4 + j], label='score')
-		# 		axs.legend()
-		# 		axs.fill_between(x, label, score[:, i*4 + j])
-		# 		plt.tight_layout()
-		# plt.show()
+		
+		'''
+		# Evaluate the computed metrics
+		fig, ax = plt.subplots(3, 4, figsize=(15, 10))
+		best = np.argmax(result)
+		x = np.linspace(0, label.shape[0], label.shape[0])
+		for i, axis in enumerate(ax):
+			for j, axs in enumerate(axis):
+				if i*4 + j == best:
+					axs.patch.set_alpha(0.3)
+					axs.patch.set_facecolor('green')
+				axs.title.set_text('{:.1f}%'.format(result[i*4 + j]*100))
+				axs.set_xlim([0, x[-1]])
+				axs.set_ylim([0, 1])
+				axs.plot(label, label='label', color='k', linewidth=2)
+				axs.plot(score[:, i*4 + j], label='score')
+				axs.legend()
+				axs.fill_between(x, label, score[:, i*4 + j])
+				plt.tight_layout()
+		plt.show()
+		'''
 
 		return result.T
 
 	@jit
-	def estimate_length(self, label):
+	def estimate_max_length(self, label):
+		"""Computes the maximum length of '1's in an anomaly label
+
+		:param label: array of 1s and 0s
+		:return  max_len: the length of the maximum continuous series of 1s in label 
+		"""
 		max_len = 0
 		counter = 0
 
@@ -254,43 +265,6 @@ class ScoresLoader:
 		score = score > threshold
 		return metrics.f1_score(label, score)
 
-
-def parallel_apply_along_axis(func1d, axis, arr, *args, **kwargs):
-	"""
-	Like numpy.apply_along_axis(), but takes advantage of multiple
-	cores.
-	"""        
-	# Effective axis where apply_along_axis() will be applied by each
-	# worker (any non-zero axis number would work, so as to allow the use
-	# of `np.array_split()`, which is only done on axis 0):
-	effective_axis = 1 if axis == 0 else axis
-	if effective_axis != axis:
-		arr = arr.swapaxes(axis, effective_axis)
-
-	# Chunks for the mapping (only a few chunks):
-	chunks = [(func1d, effective_axis, sub_arr, args, kwargs)
-		for sub_arr in np.array_split(arr, multiprocessing.cpu_count())]
-
-	pool = multiprocessing.Pool()
-	individual_results = pool.map(unpacking_apply_along_axis, chunks)
-	# Freeing the workers:
-	pool.close()
-	pool.join()
-
-	return np.concatenate(individual_results)
-
-def unpacking_apply_along_axis(all_args):
-    """
-    Like numpy.apply_along_axis(), but with arguments in a tuple
-    instead.
-
-    This function is useful with multiprocessing.Pool().map(): (1)
-    map() only handles functions that take a single argument, and (2)
-    this function can generally be imported from a module, as required
-    by map().
-    """
-    (func1d, axis, arr, args, kwargs) = all_args
-    return np.apply_along_axis(func1d, axis, arr, *args, **kwargs)
 
 
 def istarmap(self, func, iterable, chunksize=1):

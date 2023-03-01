@@ -56,6 +56,10 @@ class MetricsLoader:
 		:return: dataframe of metrics' values
 		'''
 		df = []
+
+		# Check if metric exists
+		if metric.upper() not in self.get_names():
+			raise ValueError(f"{metric} metric is not one of existing metrics")
 		
 		for detector in os.listdir(self.metrics_path):
 			for fname in glob.glob(os.path.join(self.metrics_path, detector, metric + '.csv')):

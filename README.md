@@ -24,6 +24,8 @@ The following tools are required to install MSAD from source:
 
 - models: TODO
 
+Unzip the files and move the datasets (i.e., TSB/ folder) in data/, and move the models files (i.e., the contents of the unzipped file called weight) in weights/ folder in the repo.
+
 2. Clone this repository using git and change into its root directory.
 
 ```bash

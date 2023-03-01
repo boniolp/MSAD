@@ -1,0 +1,9 @@
+python3 run_oracle.py --path=data/TSB/metrics/ --acc=0.75 --randomnes=true
+
+python3 run_avg_ens.py --n_jobs=16
+
+python3 create_windows_dataset.py --save_dir=data/ --path=data/TSB/data/ --metric_path=data/TSB/metrics/ --window_size=512 --metric=AUC_PR
+
+python3 generate_features.py --path=data/TSB_512/
+
+python3 train_feature_based.py --path=data/TSB_512/TSFRESH_TSB_512.csv --classifier=knn --split_per=0.7 --file=experiments/unsupervised_splits/unsupervised_testsize_1_split_0.csv --eval-true

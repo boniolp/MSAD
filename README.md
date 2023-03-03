@@ -146,11 +146,8 @@ The overall accuracy tables (for VUS-PR and AUC-PR) are [here](https://github.co
 
 ## Usage
 
-TODO
+
 
 
 ## References
 
-All this project is inspired and based on the following research papers, without which all this work would not have been possible. We thank the authors for their work.
-
-TODO

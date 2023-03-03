@@ -158,9 +158,9 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 		# Print results
 		print(curr_metrics)
 
-		# Save scores file (already exist in demo)
+		# Save scores file (already exist in demo but uncomment if you want to reproduce them - fill in PATH)
 		# model_name = '_'.join([classifier_name, str(window_size)])
-		# file_name = os.path.join("model_scores", metric, "{}_{}.csv".format(model_name, metric))
+		# file_name = os.path.join("PATH", metric, "{}_{}.csv".format(model_name, metric))
 		# curr_metrics.to_csv(file_name)
 
 

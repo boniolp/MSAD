@@ -136,8 +136,10 @@ class TimeseriesDataset(Dataset):
 		self.fnames = fnames
 		self.labels = []
 		self.samples = []
-		self.scores = []
 		self.indexes = []
+
+		if len(fnames) == 0:
+			return
 
 		# Read datasets
 		for fname in tqdm(self.fnames, disable=not verbose, desc="Loading dataset"):
@@ -161,7 +163,7 @@ class TimeseriesDataset(Dataset):
 		return self.labels.size
 
 	def __getitem__(self, idx):
-		return self.samples[idx], {'label': self.labels[idx], 'score': self.scores[idx]}
+		return self.samples[idx], self.labels[idx]
 
 	def __getallsamples__(self):
 		return self.samples

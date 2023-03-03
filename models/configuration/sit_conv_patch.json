@@ -13,7 +13,7 @@
 	"use_conv_patch":true,
 	"use_linear_patch":false,
 	"use_conv_stem":false,
-	"use_conv_stem_original":true,
+	"use_conv_stem_original":false,
 	"use_stem_scaled_relu":false,
 	"hidden_dims":null,
 	"cls_head":false,

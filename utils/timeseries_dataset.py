@@ -12,6 +12,7 @@
 import os
 from tqdm import tqdm
 from time import process_time
+import glob
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -129,6 +130,27 @@ def create_balanced_splits(data_path, split_per, seed):
 	return train_set, val_set
 
 
+def read_files(data_path):
+	# Load everything you can find
+	fnames = [x for x in os.listdir(data_path) if ".csv" in x]
+	
+	if len(fnames) > 0:
+		pass
+		# dataset = data_path.split('/')[-1]
+		# dataset = dataset if len(dataset) > 0 else data_path.split('/')[-2]
+		# fnames = [os.path.join(dataset, x) for x in fnames]
+	else:
+		datasets = [x for x in os.listdir(data_path) if os.path.isdir(os.path.join(data_path, x))]
+		for dataset in datasets:
+			
+			# Read file names
+			curr_fnames = os.listdir(os.path.join(data_path, dataset))
+			curr_fnames = [os.path.join(dataset, x) for x in curr_fnames]
+			fnames.extend(curr_fnames)
+
+	return fnames
+
+
 
 class TimeseriesDataset(Dataset):
 	def __init__(self, data_path, fnames, verbose=True):
@@ -138,7 +160,7 @@ class TimeseriesDataset(Dataset):
 		self.samples = []
 		self.indexes = []
 
-		if len(fnames) == 0:
+		if len(self.fnames) == 0:
 			return
 
 		# Read datasets

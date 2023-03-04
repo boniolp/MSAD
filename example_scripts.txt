@@ -7,3 +7,7 @@ python3 create_windows_dataset.py --save_dir=data/ --path=data/TSB/data/ --metri
 python3 generate_features.py --path=data/TSB_512/
 
 python3 train_feature_based.py --path=data/TSB_512/TSFRESH_TSB_512.csv --classifier=knn --split_per=0.7 --file=experiments/unsupervised_splits/unsupervised_testsize_1_split_0.csv --eval-true
+
+python3 train_deep_model.py --path=data/TSB_512/ --split=0.7 --file=experiments/supervised_splits/split_TSB_16.csv --model=resnet --params=models/configuration/resnet_default.json --batch=64 --epochs=10
+
+python3 eval_deep_model.py --data=data/TSB_512/MGAB/ --model=resnet --model_path=results/weights/resnet_default_512/model_04032023_201204 --params=models/configuration/resnet_default.json

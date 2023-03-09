@@ -1,4 +1,5 @@
-# MSAD: Model Selection for Anomaly Detection in Time Series
+<h1 align="center">MSAD</h1>
+<h2 align="center">Model Selection for Anomaly Detection in Time Series</h2>
 
 <p align="center"><a href="https://adecimots.streamlit.app/">Try our demo</a></p>
 

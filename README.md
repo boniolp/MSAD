@@ -1,5 +1,5 @@
 <p align="center">
-<img width="200" src="./assets/figures/MSAD_logo.png"/>
+<img width="150" src="./assets/figures/MSAD.png"/>
 </p>
 
 

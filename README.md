@@ -1,3 +1,8 @@
+<p align="center">
+<img width="200" src="./assets/figures/MSAD_logo.png"/>
+</p>
+
+
 <h1 align="center">MSAD</h1>
 <h2 align="center">Model Selection for Anomaly Detection in Time Series</h2>
 

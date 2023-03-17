@@ -1,8 +1,22 @@
-# MSAD: Model Selection for Anomaly Detection in Time Series
+<p align="center">
+<img width="150" src="./assets/figures/MSAD.png"/>
+</p>
 
-Anomaly detection is a fundamental task for time-series analytics with important implications for the downstream performance of many applications. Despite increasing academic interest and the large number of methods proposed in the literature, recent benchmark and evaluation studies demonstrated that no overall best anomaly detection methods exist when applied to very heterogeneous time series datasets. Therefore, the only scalable and viable solution to solve anomaly detection over very different time series collected from different domains is to propose a model selection method that will select, based on time series characteristics, the best anomaly detection method to run.Thus, this paper proposes a new pipeline for model selection based on time series classification and an extensive experimental evaluation of existing classification algorithms for this new pipeline. Our results demonstrate that model selection methods outperform every single anomaly detection method while being in the same order of magnitude regarding execution time.
 
-All the experimewntal results are accessible here: https://adecimots.streamlit.app/
+<h1 align="center">MSAD</h1>
+<h2 align="center">Model Selection for Anomaly Detection in Time Series</h2>
+
+<div align="center">
+<p>
+<img alt="GitHub" src="https://img.shields.io/github/license/boniolp/MSAD"> <img alt="GitHub issues" src="https://img.shields.io/github/issues/boniolp/MSAD">
+</p>
+</div>
+
+
+<p align="center"><a href="https://adecimots.streamlit.app/">Try our demo</a></p>
+
+MSAD proposes a pipeline for model selection based on time series classification and an extensive experimental evaluation of existing classification algorithms for this new pipeline. Our results demonstrate that model selection methods outperform every single anomaly detection method while being in the same order of magnitude regarding execution time. You can click on our demo link above to get more information and navigate through our experimental evaluation.
+
 
 ## Contributors
 
@@ -142,12 +156,3 @@ We report in the following figure the average VUS-PR and inference time (i.e., p
 
 This figure and many others comparisons are described (and reproductible) in [these notebook](https://github.com/boniolp/MSAD/tree/main/experiments/accuracy_analysis), summarized in [this document](TODO).
 The overall accuracy tables (for VUS-PR and AUC-PR) are [here](https://github.com/boniolp/MSAD/tree/main/results/accuracy), and the execution time tables (training, prediction, and inference) are [here](https://github.com/boniolp/MSAD/tree/main/results/execution_time).
-
-
-## Usage
-
-
-
-
-## References
-

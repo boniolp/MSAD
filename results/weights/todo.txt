@@ -1,4 +1,7 @@
-link to models:
-https://drive.google.com/file/d/1sQeqVZSBUuaJrvsueLtjLhACbARFS2dx/view?usp=sharing
+link to weights of the trained models:
+https://drive.google.com/file/d/14Tk_-npHIozLAYB-FAkHRtTn9CqaXwuE/view?usp=share_link
 
-download the file from the link and unzip it in this directory
+
+1) download the file from the link
+2) unzip it
+3) put its contents in this directory

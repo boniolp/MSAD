@@ -34,6 +34,9 @@ def create_splits(data_path, split_per=0.7, seed=None, read_from_file=None):
 
 	Note: The test set will be created only when reading the splits
 		from a file, otherwise only the train, val set are generated.
+		The train, val subsets share the same datasets/domains. 
+		The test sets that we used in the unsupervised experiments 
+		do not (thus the supervised, unsupervised notation).
 
 	:param data_path: path to the initial dataset to be split
 	:param split_per: the percentage in which to create the splits

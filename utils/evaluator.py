@@ -9,6 +9,14 @@
 #
 ########################################################################
 
+import os
+import pickle
+from pathlib import Path
+from collections import Counter
+from time import perf_counter
+from tqdm import tqdm
+from datetime import datetime
+
 from utils.timeseries_dataset import TimeseriesDataset
 from utils.config import *
 
@@ -17,10 +25,6 @@ from torch.utils.data import DataLoader
 
 import numpy as np
 import pandas as pd
-
-from collections import Counter
-from time import perf_counter
-from tqdm import tqdm
 
 
 class Evaluator:
@@ -97,6 +101,44 @@ class Evaluator:
 			all_preds.extend(preds.tolist())
 
 		return all_preds
+
+def save_classifier(model, path, fname=None):
+	# Set up
+	timestamp = datetime.now().strftime('%d%m%Y_%H%M%S')
+	fname = f"model_{timestamp}" if fname is None else fname
+
+	# Create saving dir if we need to
+	filename = Path(os.path.join(path, fname))
+	filename.parent.mkdir(parents=True, exist_ok=True)
+
+	# Save
+	with open(f'{filename}.pkl', 'wb') as output:
+		pickle.dump(model, output, pickle.HIGHEST_PROTOCOL)
+
+
+def load_classifier(path):
+	"""Loads a classifier/model that is a pickle (.pkl) object.
+	If the path is only the path to the directory of a given class
+	of models, then the youngest model of that class is retrieved.
+
+	:param path: path to the specific classifier to load,
+		or path to a class of classifiers (e.g. rocket)
+	:return output: the loaded classifier
+	"""
+
+	# If model is not given, load the latest
+	if os.path.isdir(path):
+		models = [x for x in os.listdir(path) if '.pkl' in x]
+		models.sort(key=lambda date: datetime.strptime(date, 'model_%d%m%Y_%H%M%S.pkl'))
+		path = os.path.join(path, models[-1])
+	elif '.pkl' not in path:
+		raise ValueError(f"Can't load this type of file {path}. Only '.pkl' files please")
+
+	filename = Path(path)
+	with open(f'{filename}', 'rb') as input:
+		output = pickle.load(input)
+	
+	return output
 
 '''
 	def predict_non_deep(self, model, X_val, y_val):

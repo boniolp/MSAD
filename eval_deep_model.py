@@ -14,7 +14,6 @@ import re
 
 import torch
 from torch.utils.data import DataLoader
-from utils.metrics_loader import MetricsLoader
 
 from utils.config import *
 from utils.train_deep_model_utils import json_file
@@ -25,9 +24,10 @@ from utils.evaluator import Evaluator
 def eval_deep_model(data_path, model_name, model_path, model_parameters_file):
 	"""Given a model and some data it predicts the time series given
 
-	:param path_model:
+	:param data_path:
+	:param model_name:
+	:param model_path:
 	:param model_parameters_file:
-	:param path_data:
 	"""
 	batch_size = 128
 	window_size = int(re.search(r'\d+', str(data_path)).group())
@@ -49,11 +49,9 @@ def eval_deep_model(data_path, model_name, model_path, model_parameters_file):
 		fnames = read_files(data_path)
 
 	# Evaluate model
-	metricsloader = MetricsLoader(TSB_metrics_path)
-	metrics = metricsloader.get_names()
 	evaluator = Evaluator()
-
 	model_name = "{}_{}".format(args.params[1], window_size)
+	
 	# fnames = fnames[:10]
 	preds = evaluator.predict(
 		model,

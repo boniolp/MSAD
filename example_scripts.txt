@@ -10,4 +10,6 @@ python3 train_feature_based.py --path=data/TSB_512/TSFRESH_TSB_512.csv --classif
 
 python3 train_deep_model.py --path=data/TSB_512/ --split=0.7 --file=experiments/supervised_splits/split_TSB_16.csv --model=resnet --params=models/configuration/resnet_default.json --batch=64 --epochs=10
 
-python3 eval_deep_model.py --data=data/TSB_512/MGAB/ --model=resnet --model_path=results/weights/resnet_default_512/model_04032023_201204 --params=models/configuration/resnet_default.json
+python3 eval_deep_model.py --data=data/TSB_512/ --model=convnet --model_path=results/weights/supervised/convnet_default_512/model_30012023_173428 --params=models/configuration/convnet_default.json
+
+python3 train_rocket.py --path=data/TSB_512/ --split_per=0.7 --file=experiments/supervised_splits/split_TSB_512.csv --eval-true --path_save=results/weights/supervised/

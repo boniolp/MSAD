@@ -59,7 +59,7 @@ classifiers = {
 
 
 def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, read_from_file=None, eval_model=False):
-	# Setup for cmd line args and device
+	# Set up
 	window_size = int(re.search(r'\d+', data_path).group())
 	
 	# Load the splits
@@ -87,7 +87,7 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 	val_data = data.loc[data.index.get_level_values("name").isin(val_indexes)]
 	test_data = data.loc[data.index.get_level_values("name").isin(test_indexes)]
 	
-	# Split x & y
+	# Split data from labels
 	y_train, X_train = training_data['label'], training_data.drop('label', 1)
 	y_val, X_val = val_data['label'], val_data.drop('label', 1)
 	y_test, X_test = test_data['label'], test_data.drop('label', 1)
@@ -165,32 +165,32 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 
 
 if __name__ == "__main__":
-		parser = argparse.ArgumentParser(
-			prog='train_feature_based',
-			description='Script for training the traditional classifiers',
+	parser = argparse.ArgumentParser(
+		prog='train_feature_based',
+		description='Script for training the traditional classifiers',
+	)
+	parser.add_argument('-p', '--path', type=str, help='path to the dataset to use', required=True)
+	parser.add_argument('-c', '--classifier', type=str, help='classifier to run', required=True)
+	parser.add_argument('-sp', '--split_per', type=float, help='split percentage for train and val sets', default=0.7)
+	parser.add_argument('-s', '--seed', type=int, help='seed for splitting train, val sets (use small number)', default=None)
+	parser.add_argument('-f', '--file', type=str, help='path to file that contains a specific split', default=None)
+	# parser.add_argument('-e', '--eval', type=bool, help='whether to evaluate the model on test data after training', default=False)
+	parser.add_argument('-e', '--eval-true', action="store_true", help='whether to evaluate the model on test data after training')
+
+	args = parser.parse_args()
+
+	# Option to all classifiers
+	if args.classifier == 'all':
+		clf_list = list(classifiers.keys())
+	else:
+		clf_list = [args.classifier]
+
+	for classifier in clf_list:
+		train_feature_based(
+			data_path=args.path, 
+			classifier_name=classifier,
+			split_per=args.split_per, 
+			seed=args.seed,
+			read_from_file=args.file,
+			eval_model=args.eval_true
 		)
-		parser.add_argument('-p', '--path', type=str, help='path to the dataset to use', required=True)
-		parser.add_argument('-c', '--classifier', type=str, help='classifier to run', required=True)
-		parser.add_argument('-sp', '--split_per', type=float, help='split percentage for train and val sets', default=0.7)
-		parser.add_argument('-s', '--seed', type=int, help='seed for splitting train, val sets (use small number)', default=None)
-		parser.add_argument('-f', '--file', type=str, help='path to file that contains a specific split', default=None)
-		# parser.add_argument('-e', '--eval', type=bool, help='whether to evaluate the model on test data after training', default=False)
-		parser.add_argument('-e', '--eval-true', action="store_true", help='whether to evaluate the model on test data after training')
-
-		args = parser.parse_args()
-
-		# Option to all classifiers
-		if args.classifier == 'all':
-			clf_list = list(classifiers.keys())
-		else:
-			clf_list = [args.classifier]
-
-		for classifier in clf_list:
-			train_feature_based(
-				data_path=args.path, 
-				classifier_name=classifier,
-				split_per=args.split_per, 
-				seed=args.seed,
-				read_from_file=args.file,
-				eval_model=args.eval_true
-			)

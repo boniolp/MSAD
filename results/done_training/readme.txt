@@ -1,0 +1,1 @@
+Here small .csv files are being saved when a deep learning model is done training, with a few information on how the training went. This is very helpful when training multiple models in parallel to keep track of everything.

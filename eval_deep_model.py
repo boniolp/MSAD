@@ -29,7 +29,7 @@ def eval_deep_model(data_path, model_name, model_path, model_parameters_file):
 	:param model_parameters_file:
 	:param path_data:
 	"""
-	batch_size = 64
+	batch_size = 128
 	window_size = int(re.search(r'\d+', str(data_path)).group())
 
 	# Read models parameters
@@ -40,8 +40,13 @@ def eval_deep_model(data_path, model_name, model_path, model_parameters_file):
 	model.load_state_dict(torch.load(model_path))
 	model.to('cuda')
 
-	# Read data
-	fnames = read_files(data_path)
+	# Read data (single csv file or directory with csvs)
+	if '.csv' == data_path[-len('.csv'):]:
+		fnames = [data_path.split('/')[-1]]
+		data_path = data_path.split('/')[:-1]
+		data_path = '/'.join(data_path)
+	else:
+		fnames = read_files(data_path)
 
 	# Evaluate model
 	metricsloader = MetricsLoader(TSB_metrics_path)
@@ -49,7 +54,7 @@ def eval_deep_model(data_path, model_name, model_path, model_parameters_file):
 	evaluator = Evaluator()
 
 	model_name = "{}_{}".format(args.params[1], window_size)
-	fnames = fnames[:10]
+	# fnames = fnames[:10]
 	preds = evaluator.predict(
 		model,
 		fnames,

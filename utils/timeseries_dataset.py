@@ -11,28 +11,41 @@
 
 import os
 from tqdm import tqdm
-from time import process_time
-import glob
 
-import matplotlib.pyplot as plt
+from utils.config import *
+
 import pandas as pd
 import numpy as np
 import math
 from collections import Counter
-import math
-
 from sklearn.utils.class_weight import compute_class_weight
-from sklearn import preprocessing
 
 import torch
 from torch.utils.data import Dataset
-from torch.utils.data import random_split
 
-from utils.config import *
-from utils.metrics_loader import MetricsLoader
 
 
 def create_splits(data_path, split_per=0.7, seed=None, read_from_file=None):
+	"""Creates the splits of a single dataset to train, val, test subsets.
+	This is done either randomly, or with a seed, or read the split from a
+	file. Please see such files (the ones we used for our experiments) in 
+	the directory "experiments/supervised_splits" or 
+	"experiments/unsupervised_splits".
+
+	Note: The test set will be created only when reading the splits
+		from a file, otherwise only the train, val set are generated.
+
+	:param data_path: path to the initial dataset to be split
+	:param split_per: the percentage in which to create the splits
+		(skipped when read_from_file)
+	:param seed: the seed to use to create the 'random' splits
+		(we strongly advise you to use small numbers)
+	:param read_from_file: file to read fixed splits from
+
+	:return train_set: list of strings of time series file names
+	:return val_set: list of strings of time series file names
+	:return test_set: list of strings of time series file names
+	"""
 	train_set = []
 	val_set = []
 	test_set = []
@@ -89,48 +102,14 @@ def create_splits(data_path, split_per=0.7, seed=None, read_from_file=None):
 	return train_set, val_set, test_set
 
 
-
-def create_balanced_splits(data_path, split_per, seed):
-	np.random.seed(seed)
-	all_fnames = []
-	all_labels = []
-	train_set = []
-	val_set = []
-
-	datasets = [x for x in os.listdir(data_path) if os.path.isdir(os.path.join(data_path, x))]
-	for dataset in tqdm(datasets, desc='Creating split'):
-		# Read file names
-		fnames = [os.path.join(dataset, x) for x in os.listdir(os.path.join(data_path, dataset))]
-		all_fnames.extend(fnames)
-		for fname in fnames:
-			value = pd.read_csv(os.path.join(data_path, fname), usecols=['genie_label']).iloc[0].values[0]
-			all_labels.append(value)
-	all_fnames = np.asarray(all_fnames)
-	all_labels = np.asarray(all_labels)
-	labels_range = np.unique(all_labels)
-
-	for label in labels_range:
-		curr_idxs = np.where(all_labels == label)[0]
-
-		# Decide on the size of each subset
-		n_samples = curr_idxs.size
-		train_split = math.ceil(n_samples * split_per)
-		val_split = n_samples - train_split
-
-		# Select random files for each subset
-		train_idx = np.random.choice(
-			curr_idxs, 
-			size=train_split, 
-			replace=False
-		)
-		val_idx = np.asarray([x for x in curr_idxs if x not in train_idx])
-		train_set.extend(all_fnames[train_idx])
-		val_set.extend(all_fnames[val_idx])
-		
-	return train_set, val_set
-
-
 def read_files(data_path):
+	"""Returns a list of names of the csv files in the 
+	directory given.
+
+	:param data_path: path to the directory/-ies with csv time series files
+	:return fnames: list of strings
+	"""
+
 	# Load everything you can find
 	fnames = [x for x in os.listdir(data_path) if ".csv" in x]
 	
@@ -173,7 +152,7 @@ class TimeseriesDataset(Dataset):
 			self.indexes.extend(curr_idxs)	
 			self.labels.extend(data['label'].tolist())
 			self.samples.append(data.iloc[:, 1:].to_numpy())
-			
+		
 		# Concatenate samples and labels
 		self.labels = np.asarray(self.labels)
 		self.samples = np.concatenate(self.samples, axis=0)

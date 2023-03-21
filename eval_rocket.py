@@ -9,89 +9,81 @@
 #
 ########################################################################
 
+import argparse
+import re
+import os
+
+from utils.timeseries_dataset import read_files
+from utils.evaluator import Evaluator, load_classifier
 
 
-
-def eval_rocket(data_path, model_path, read_from_file=None, data=None):
+def eval_rocket(data_path, model_path, path_save, fnames=None, inf_time=True):
 	"""Predict some time series with the given rocket model
 
-	:param data_path:
-	:param model_name:
-	:param read_from_file:
-	:param data:
+	:param data_path: path to the data to predict
+	:param model_path: path to the model to load and use for predictions
+	:param read_from_file: file to read which time series to predict from a given path
+	:param data: data to call directly from another function with loaded data
 	"""
+	window_size = int(re.search(r'\d+', str(data_path)).group())
+	classifier_name = f"rocket_{window_size}"
 
-	# Load model (rocket BUT maybe also any other feature based clf)
+	# Load model 
+	model = load_classifier(model_path)
 
-	# Load data (do this for deep learning too - the thing with the data and read_from_file)
-	if data is None:
-		if read_from_file is None:
-			pass # Load every time series under this dir similar to eval_deep_model
-		else:
-			pass # Find test (if no test, then val), and load every timeseries name in there
+	# Read data (single csv file or directory with csvs)
+	if '.csv' == data_path[-len('.csv'):]:
+		tmp_fnames = [data_path.split('/')[-1]]
+		data_path = data_path.split('/')[:-1]
+		data_path = '/'.join(data_path)
+	else:
+		tmp_fnames = read_files(data_path)
 
-	# Call the evaluator
+	# Keep specific time series if fnames is given
+	if fnames is not None:
+		fnames_len = len(fnames)
+		fnames = [x for x in tmp_fnames if x in fnames]
+		if len(fnames) != fnames_len:
+			raise ValueError("The data path does not include the time series in fnames")
+	else:
+		fnames = tmp_fnames
 
-	# Compute the predictions and the inference time per time series (let use choose for inf)
-		# Add inf time for deep learning too
-
-	# Print results
-
-	# Save the results (Somewhere in results but don't know where in specific)
-		# Save results for deep learning too
-
-
-
-
-
-
-
-'''
-	# Save pipeline
-	saving_dir = os.path.join(path_save, classifier_name) if classifier_name.lower() not in path_save.lower() else path_save
-	save_classifier(classifier, saving_dir, fname=None)
-	classifier = load_classifier(saving_dir)
-
-	# Print training information and accuracy on validation set
-	toc = perf_counter()
-	print("training time: {:.3f} secs".format(toc-tic))
-	tic = perf_counter()
-	classifier_score = classifier.score(X_val, y_val)
-	toc = perf_counter()
-	print('valid accuracy: {:.3%}'.format(classifier_score))
-	print("inference time: {:.3} ms".format(((toc-tic)/X_val.shape[0]) * 1000))
-	exit()
-
-	# Load scores
-	# test_set = test_set[:5]
-	data_loader = DataLoader(TSB_data_path)
-	eval_set = test_set if unsupervised else val_set
-	fnames = [x[:-4] for x in eval_set]
-	
-	# Load metrics
-	metricsloader = MetricsLoader(TSB_new_metrics_path)
-
-	# Evaluating the model
+	# Compute predictions and inference time
 	evaluator = Evaluator()
-	for metric in metrics:
-			metrics = metricsloader.read(metric=metric).loc[fnames]
-			curr_metrics = evaluator.compute_anom_score_simple(
-					model=classifier,
-					model_type="rocket",
-					fnames=eval_set,
-					metric_values=metrics[detector_names],
-					metric=metric,
-					data_path=data_path,
-					batch_size=batch_size
-			)
-			curr_metrics.columns = ["rocket_{}_{}".format(str(window_size), x) for x in curr_metrics.columns.values]
+	results = evaluator.predict(
+		model=model,
+		fnames=fnames,
+		data_path=data_path,
+		deep_model=False,
+		inf_time=inf_time
+	)
+	results.columns = [f"{classifier_name}_{x}" for x in results.columns.values]
+	
+	# Print results
+	print(results)
 
-			# Save scores
-			model_name = '_'.join([classifier_name, str(seed), str(keep_labels), str(window_size)])
-			if unsupervised:
-					unsupervised_name = str(unsupervised).split('/')[-1][:-4].replace('unsupervised_', '')
-					file_name = os.path.join("unsupervised_model_scores", metric, "{}_{}_{}.csv".format(model_name, metric, unsupervised_name))
-			else:
-					file_name = os.path.join("model_scores", metric, "{}_{}.csv".format(model_name, metric))
-			curr_metrics.to_csv(file_name)
-'''
+	# Save the results
+	file_name = os.path.join(path_save, f"{classifier_name}_preds.csv")
+	results.to_csv(file_name)
+
+
+
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser(
+		prog='Evaluate rocket models',
+		description='Evaluate rocekt models \
+			on a single or multiple time series and save the results'
+	)
+	
+	parser.add_argument('-d', '--data', type=str, help='path to the time series to predict', required=True)
+	parser.add_argument('-mp', '--model_path', type=str, help='path to the trained model', required=True)
+	parser.add_argument('-ps', '--path_save', type=str, help='path to save the results', default="results/weights")
+	parser.add_argument('-i', '--inference-true', action="store_true", help='whether to save inference time')
+
+	args = parser.parse_args()
+	eval_rocket(
+		data_path=args.data, 
+		model_path=args.model_path,
+		path_save=args.path_save,
+		inf_time=args.inference_true
+	)

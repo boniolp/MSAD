@@ -27,8 +27,9 @@ from sklearn.linear_model import SGDClassifier
 from utils.timeseries_dataset import create_splits, TimeseriesDataset
 from utils.data_loader import DataLoader
 from utils.metrics_loader import MetricsLoader
-from utils.evaluator import save_classifier, load_classifier
+from utils.evaluator import save_classifier
 from utils.config import *
+from eval_rocket import eval_rocket
 
 
 
@@ -36,6 +37,8 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	# Set up
 	window_size = int(re.search(r'\d+', data_path).group())
 	classifier_name = f"rocket_{window_size}"
+	path_save_results = "results/raw_predictions"	# change if needed
+	inf_time = True 								# change if needed
 
 	# Load the splits
 	train_set, val_set, test_set = create_splits(
@@ -44,7 +47,7 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 		seed=seed,
 		read_from_file=read_from_file,
 	)
-	train_set, val_set, test_set = train_set[:500], val_set[:100], test_set[:5]
+	train_set, val_set, test_set = train_set[:10], val_set[:10], test_set[:5]
 
 	# Load the data
 	training_data = TimeseriesDataset(data_path, fnames=train_set)
@@ -96,10 +99,6 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	del X_train
 	del y_train
 
-	# Save pipeline
-	saving_dir = os.path.join(path_save, classifier_name) if classifier_name.lower() not in path_save.lower() else path_save
-	save_classifier(classifier, saving_dir, fname=None)
-
 	# Print training information and accuracy on validation set
 	toc = perf_counter()
 	print("training time: {:.3f} secs".format(toc-tic))
@@ -108,6 +107,20 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	toc = perf_counter()
 	print('valid accuracy: {:.3%}'.format(classifier_score))
 	print("inference time: {:.3} ms".format(((toc-tic)/X_val.shape[0]) * 1000))
+
+	# Save pipeline
+	saving_dir = os.path.join(path_save, classifier_name) if classifier_name.lower() not in path_save.lower() else path_save
+	save_classifier(classifier, saving_dir, fname=None)
+
+	# Evaluate on validation set or test set
+	eval_set = test_set if len(test_set) > 0 else val_set
+	eval_rocket(
+		data_path=data_path, 
+		model_path=saving_dir,
+		path_save=path_save_results,
+		fnames=eval_set,
+		inf_time=inf_time,
+	)
 
 
 

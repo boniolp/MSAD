@@ -25,6 +25,7 @@ from utils.timeseries_dataset import create_splits, TimeseriesDataset
 from utils.data_loader import DataLoader
 from utils.metrics_loader import MetricsLoader
 from utils.scores_loader import ScoresLoader
+from utils.evaluator import save_classifier
 from utils.config import *
 
 from sklearn.neural_network import MLPClassifier
@@ -58,7 +59,7 @@ classifiers = {
 }
 
 
-def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, read_from_file=None, eval_model=False):
+def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, read_from_file=None, eval_model=False, path_save=None):
 	# Set up
 	window_size = int(re.search(r'\d+', data_path).group())
 	
@@ -92,10 +93,6 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 	y_val, X_val = val_data['label'], val_data.drop('label', 1)
 	y_test, X_test = test_data['label'], test_data.drop('label', 1)
 
-	# Create the names of the files we are going to use for evaluation
-	# val_set = [re.sub(r'\d+$', '', x) for x in list(val_data.index)]
-	# val_set = [x[:-1] for x in list(set(val_set))]
-
 	# Select the classifier
 	classifier = classifiers[classifier_name]
 
@@ -118,14 +115,20 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 	print('valid accuracy: {:.3%}'.format(classifier_score))
 	print("inference time: {:.3} ms".format(((toc-tic)/X_val.shape[0]) * 1000))
 
-	# Load metrics
-	metricsloader = MetricsLoader(TSB_metrics_path)
-	metrics = metricsloader.get_names()
+	# Save pipeline
+	classifier_name = f"{classifier_name}_{window_size}"
+	saving_dir = os.path.join(path_save, classifier_name) if classifier_name.lower() not in path_save.lower() else path_save
+	save_classifier(classifier, saving_dir, fname=None)
 
+	# Can't run model evaluation if no test set
 	if not eval_model:
 		return
 	elif len(test_indexes) == 0:
 		raise ValueError('No test set given for evaluating the model')
+
+	# Load metrics
+	metricsloader = MetricsLoader(TSB_metrics_path)
+	metrics = metricsloader.get_names()
 
 	# Evaluating the model
 	# test_indexes = test_indexes[:10]
@@ -153,14 +156,13 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 
 		# Create df
 		curr_metrics = pd.DataFrame(data=zip(pred_scores, all_preds, inf_time), columns=["score", "class", "inf"], index=test_indexes)
-		curr_metrics.columns = ["{}_{}_{}".format(classifier_name, str(window_size), x) for x in curr_metrics.columns.values]
+		curr_metrics.columns = ["{}_{}".format(classifier_name, x) for x in curr_metrics.columns.values]
 
 		# Print results
 		print(curr_metrics)
 
 		# Save scores file (already exist in demo but uncomment if you want to reproduce them - fill in PATH)
-		# model_name = '_'.join([classifier_name, str(window_size)])
-		# file_name = os.path.join("PATH", metric, "{}_{}.csv".format(model_name, metric))
+		# file_name = os.path.join("PATH", metric, "{}_{}.csv".format(classifier_name, metric))
 		# curr_metrics.to_csv(file_name)
 
 
@@ -174,8 +176,8 @@ if __name__ == "__main__":
 	parser.add_argument('-sp', '--split_per', type=float, help='split percentage for train and val sets', default=0.7)
 	parser.add_argument('-s', '--seed', type=int, help='seed for splitting train, val sets (use small number)', default=None)
 	parser.add_argument('-f', '--file', type=str, help='path to file that contains a specific split', default=None)
-	# parser.add_argument('-e', '--eval', type=bool, help='whether to evaluate the model on test data after training', default=False)
 	parser.add_argument('-e', '--eval-true', action="store_true", help='whether to evaluate the model on test data after training')
+	parser.add_argument('-ps', '--path_save', type=str, help='path to save the trained classifier', default="results/weights")
 
 	args = parser.parse_args()
 
@@ -192,5 +194,6 @@ if __name__ == "__main__":
 			split_per=args.split_per, 
 			seed=args.seed,
 			read_from_file=args.file,
-			eval_model=args.eval_true
+			eval_model=args.eval_true,
+			path_save=args.path_save
 		)

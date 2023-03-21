@@ -114,7 +114,7 @@ def read_files(data_path):
 	"""
 
 	# Load everything you can find
-	fnames = [x for x in os.listdir(data_path) if ".csv" in x]
+	fnames = [x for x in os.listdir(data_path) if ".csv" in x and "tsfresh" not in x.lower()]
 	
 	if len(fnames) > 0:
 		pass

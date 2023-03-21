@@ -36,26 +36,30 @@ class Evaluator:
 		model,
 		fnames,
 		data_path,
-		batch_size
+		batch_size=64,
+		deep_model=True,
+		inf_time=False
 	):
-		"""Predict function for all the deep learning models
-		(ConvNet, ResNet, InceptionTime, SignalTransformer).
+		"""Predict function for all the models
 
 		:param model: the object model whose predictions we want
 		:param fnames: the names of the timeseries to be predicted
 		:param data_path: the path to the timeseries 
 			(please check that path and fnames together make the complete path)
 		:param batch_size: the batch size used to make the predictions
+		:param deep_model:
+		:param inf_time:
 		:return df: dataframe with timeseries and predictions per time series
 		"""
 
 		# Setup
 		all_preds = []
+		inf_time = []
 
 		loop = tqdm(
 			fnames, 
 			total=len(fnames),
-			desc=f"Computing({batch_size})",
+			desc="Computing",
 			unit="files",
 			leave=True
 		)
@@ -68,18 +72,26 @@ class Evaluator:
 				fnames=[fname],
 				verbose=False
 			)
-			preds = self.predict_timeseries(model, data, batch_size=batch_size, device='cuda')
-			
+			if deep_model:
+				tic = perf_counter()
+				preds = self.predict_timeseries(model, data, batch_size=batch_size, device='cuda')
+			else:
+				X_val, y_val = data.__getallsamples__().astype('float32'), data.__getalllabels__()
+				tic = perf_counter()
+				preds = self.predict_timeseries_non_deep(model, X_val, y_val)
+
 			# Compute metric value
 			counter = Counter(preds)
 			most_voted = counter.most_common(1)
+			toc = perf_counter()
 			
 			# Save info
 			all_preds.append(detector_names[most_voted[0][0]])
+			inf_time.append(toc-tic)
 		
 		fnames = [x[:-4] for x in fnames]
 
-		return pd.DataFrame(data=all_preds, columns=["class"], index=fnames)
+		return pd.DataFrame(data=zip(all_preds, inf_time), columns=["class", "inf"], index=fnames)
 
 
 	def predict_timeseries(self, model, val_data, batch_size, device='cuda', k=1):
@@ -101,6 +113,23 @@ class Evaluator:
 			all_preds.extend(preds.tolist())
 
 		return all_preds
+
+
+	def predict_timeseries_non_deep(self, model, X_val, y_val):
+		all_preds = []
+		all_acc = []
+		
+		# Make predictions
+		preds = model.predict(X_val)
+
+		# preds = outputs.argmax(dim=1)
+		# acc = (y_val == preds).sum() / y_val.shape[0]
+
+		# all_acc.append(acc)
+		all_preds.extend(preds.tolist())
+
+		return all_preds
+
 
 def save_classifier(model, path, fname=None):
 	# Set up

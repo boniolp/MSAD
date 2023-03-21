@@ -51,7 +51,7 @@ def eval_deep_model(data_path, model_name, model_path, model_parameters_file):
 	# Evaluate model
 	evaluator = Evaluator()
 	model_name = "{}_{}".format(args.params[1], window_size)
-	
+
 	# fnames = fnames[:10]
 	preds = evaluator.predict(
 		model,
@@ -65,8 +65,9 @@ def eval_deep_model(data_path, model_name, model_path, model_parameters_file):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(
-		prog='run_experiment',
-		description='This function is made so that we can easily run configurable experiments'
+		prog='Evaluate deep learning models',
+		description='Evaluate all deep learning architectures on a single or multiple time series \
+			and save the results'
 	)
 	
 	parser.add_argument('-d', '--data', type=str, help='path to the time series to predict', required=True)

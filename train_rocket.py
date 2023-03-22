@@ -14,6 +14,7 @@ import os
 import re
 from time import perf_counter
 from tqdm import tqdm
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -37,8 +38,10 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	# Set up
 	window_size = int(re.search(r'\d+', data_path).group())
 	classifier_name = f"rocket_{window_size}"
-	path_save_results = "results/raw_predictions"	# change if needed
-	inf_time = True 								# change if needed
+	training_stats = {}
+	save_done_training = "results/done_training/"	# change if needed
+	path_save_results = "results/raw_predictions"
+	inf_time = True 		# compute inference time per timeseries
 
 	# Load the splits
 	train_set, val_set, test_set = create_splits(
@@ -47,7 +50,7 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 		seed=seed,
 		read_from_file=read_from_file,
 	)
-	train_set, val_set, test_set = train_set[:10], val_set[:10], test_set[:5]
+	# train_set, val_set, test_set = train_set[:10], val_set[:10], test_set[:5]
 
 	# Load the data
 	training_data = TimeseriesDataset(data_path, fnames=train_set)
@@ -89,6 +92,7 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 			X = X_train[curr_batch]
 			Y = y_train[curr_batch]
 			clf.partial_fit(X, Y, classes=list(np.arange(12)))
+	toc = perf_counter()
 
 	# Put every fitted component into a pipeline
 	classifier = make_pipeline(
@@ -99,29 +103,39 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	del X_train
 	del y_train
 
-	# Print training information and accuracy on validation set
-	toc = perf_counter()
-	print("training time: {:.3f} secs".format(toc-tic))
+	# Print training time
+	training_stats["training_time"] = toc-tic
+	print(f"training time: {training_stats['training_time']:.3f} secs")
+
+	# Print valid accuracy and inference time
 	tic = perf_counter()
 	classifier_score = classifier.score(X_val, y_val)
 	toc = perf_counter()
-	print('valid accuracy: {:.3%}'.format(classifier_score))
-	print("inference time: {:.3} ms".format(((toc-tic)/X_val.shape[0]) * 1000))
+	training_stats["val_acc"] = classifier_score
+	training_stats["avg_inf_time"] = ((toc-tic)/X_val.shape[0]) * 1000
+	print(f"valid accuracy: {training_stats['val_acc']:.3%}")
+	print(f"inference time: {training_stats['avg_inf_time']:.3} ms")
+	print(training_stats)
+
+	# Save training stats (uncomment to keep track of finished trained models)
+	timestamp = datetime.now().strftime('%d%m%Y_%H%M%S')
+	df = pd.DataFrame.from_dict(training_stats, columns=["training_stats"], orient="index")
+	df.to_csv(os.path.join(save_done_training, f"{classifier_name}_{timestamp}.csv"))
 
 	# Save pipeline
 	saving_dir = os.path.join(path_save, classifier_name) if classifier_name.lower() not in path_save.lower() else path_save
-	save_classifier(classifier, saving_dir, fname=None)
+	saved_model_path = save_classifier(classifier, saving_dir, fname=None)
 
-	# Evaluate on validation set or test set
-	eval_set = test_set if len(test_set) > 0 else val_set
-	eval_rocket(
-		data_path=data_path, 
-		model_path=saving_dir,
-		path_save=path_save_results,
-		fnames=eval_set,
-		inf_time=inf_time,
-	)
-
+	# Evaluate on test set or val set
+	if eval_model:
+		eval_set = test_set if len(test_set) > 0 else val_set
+		eval_rocket(
+			data_path=data_path, 
+			model_path=saved_model_path,
+			path_save=path_save_results,
+			fnames=eval_set,
+			inf_time=inf_time,
+		)
 
 
 if __name__ == "__main__":

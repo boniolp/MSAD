@@ -137,12 +137,14 @@ def save_classifier(model, path, fname=None):
 	fname = f"model_{timestamp}" if fname is None else fname
 
 	# Create saving dir if we need to
-	filename = Path(os.path.join(path, fname))
+	filename = Path(os.path.join(path, f"{fname}.pkl"))
 	filename.parent.mkdir(parents=True, exist_ok=True)
 
 	# Save
-	with open(f'{filename}.pkl', 'wb') as output:
+	with open(filename, 'wb') as output:
 		pickle.dump(model, output, pickle.HIGHEST_PROTOCOL)
+
+	return str(filename)
 
 
 def load_classifier(path):

@@ -20,6 +20,8 @@ TSB_data_path = "data/TSB/data/"
 TSB_metrics_path = "data/TSB/metrics/"
 TSB_scores_path = "data/TSB/scores/"
 
+save_done_training = 'results/done_training/'	# when a model is done training a csv with training info is saved here
+path_save_results = 'results/raw_predictions'	# when evaluating a model, the predictions will be saved here
 
 # Detector
 detector_names = [

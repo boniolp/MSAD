@@ -39,8 +39,6 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	window_size = int(re.search(r'\d+', data_path).group())
 	classifier_name = f"rocket_{window_size}"
 	training_stats = {}
-	save_done_training = "results/done_training/"	# change if needed
-	path_save_results = "results/raw_predictions"
 	inf_time = True 		# compute inference time per timeseries
 
 	# Load the splits
@@ -86,7 +84,7 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 			curr_batch = indexes_shuffled[iterator_train:iterator_train+batch_size]
 			X_train[curr_batch] = scaler.transform(X_train[curr_batch])
 
-	# Fitting the classifier
+	# Fit the classifier
 	for iterator_train in tqdm(range(0, X_train.shape[0], batch_size), desc='training'):
 			curr_batch = indexes_shuffled[iterator_train:iterator_train+batch_size]
 			X = X_train[curr_batch]
@@ -115,9 +113,8 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	training_stats["avg_inf_time"] = ((toc-tic)/X_val.shape[0]) * 1000
 	print(f"valid accuracy: {training_stats['val_acc']:.3%}")
 	print(f"inference time: {training_stats['avg_inf_time']:.3} ms")
-	print(training_stats)
 
-	# Save training stats (uncomment to keep track of finished trained models)
+	# Save training stats
 	timestamp = datetime.now().strftime('%d%m%Y_%H%M%S')
 	df = pd.DataFrame.from_dict(training_stats, columns=["training_stats"], orient="index")
 	df.to_csv(os.path.join(save_done_training, f"{classifier_name}_{timestamp}.csv"))

@@ -57,15 +57,16 @@ def create_tmp_dataset(
 	metricsloader = MetricsLoader(metric_path)
 	metrics_data = metricsloader.read(metric)
 
+	# Delete any data not in metrics (some timeseries metric scores were not computed)
+	idx_to_delete = [i for i, x in enumerate(fnames) if x not in metrics_data.index]
+
 	# Delete any time series shorter than requested window
 	idx_to_delete_short = [i for i, ts in enumerate(x) if ts.shape[0] < window_size]
 	if len(idx_to_delete_short) > 0:
 		print(">>> Window size: {} too big for some timeseries. Deleting {} timeseries"
 				.format(window_size, len(idx_to_delete_short)))
 		idx_to_delete.extend(idx_to_delete_short)
-
-	# Delete any data not in metrics (some timeseries metric scores were not computed)
-	idx_to_delete = [i for i, x in enumerate(fnames) if x not in metrics_data.index]
+		
 	if len(idx_to_delete) > 0:
 		for idx in sorted(idx_to_delete, reverse=True):
 			del x[idx]

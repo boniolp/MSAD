@@ -46,8 +46,6 @@ def train_deep_model(
 	device = 'cuda'
 	save_runs = 'results/runs/'
 	save_weights = 'results/weights/'
-	save_done_training = 'results/done_training/'
-	path_save_results = "results/raw_predictions"
 	inf_time = True 		# compute inference time per timeseries
 
 	# Load the splits

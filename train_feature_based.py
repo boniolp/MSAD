@@ -16,17 +16,10 @@ from time import perf_counter
 import re
 from collections import Counter
 from tqdm import tqdm
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
-
-from utils.timeseries_dataset import create_splits, TimeseriesDataset
-
-from utils.data_loader import DataLoader
-from utils.metrics_loader import MetricsLoader
-from utils.scores_loader import ScoresLoader
-from utils.evaluator import save_classifier
-from utils.config import *
 
 from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -35,6 +28,11 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.svm import LinearSVC
+
+from utils.timeseries_dataset import create_splits, TimeseriesDataset
+from eval_feature_based import eval_feature_based
+from utils.evaluator import save_classifier
+from utils.config import *
 
 names = {
 		"knn": "Nearest Neighbors",
@@ -62,6 +60,8 @@ classifiers = {
 def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, read_from_file=None, eval_model=False, path_save=None):
 	# Set up
 	window_size = int(re.search(r'\d+', data_path).group())
+	training_stats = {}
+	inf_time = True 		# compute inference time per timeseries
 	
 	# Load the splits
 	train_set, val_set, test_set = create_splits(
@@ -95,6 +95,7 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 
 	# Select the classifier
 	classifier = classifiers[classifier_name]
+	clf_name = classifier_name
 
 	# For svc_linear use only a random subset of the dataset to train
 	if 'svc' in classifier_name and len(y_train) > 200000:
@@ -103,67 +104,44 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 		y_train = y_train.iloc[rand_ind]
 
 	# Fit the classifier
-	print('----------------------------------')
-	print(f'Training {names[classifier_name]}...')
+	print(f'----------------------------------\nTraining {names[classifier_name]}...')
 	tic = perf_counter()
 	classifier.fit(X_train, y_train)
 	toc = perf_counter()
-	print("training time: {:.3f} secs".format(toc-tic))
+
+	# Print training time
+	training_stats["training_time"] = toc - tic
+	print(f"training time: {training_stats['training_time']:.3f} secs")
+	
+	# Print valid accuracy and inference time
 	tic = perf_counter()
 	classifier_score = classifier.score(X_val, y_val)
 	toc = perf_counter()
-	print('valid accuracy: {:.3%}'.format(classifier_score))
-	print("inference time: {:.3} ms".format(((toc-tic)/X_val.shape[0]) * 1000))
+	training_stats["val_acc"] = classifier_score
+	training_stats["avg_inf_time"] = ((toc-tic)/X_val.shape[0]) * 1000
+	print(f"valid accuracy: {training_stats['val_acc']:.3%}")
+	print(f"inference time: {training_stats['avg_inf_time']:.3} ms")
+
+	# Save training stats
+	classifier_name = f"{clf_name}_{window_size}"
+	timestamp = datetime.now().strftime('%d%m%Y_%H%M%S')
+	df = pd.DataFrame.from_dict(training_stats, columns=["training_stats"], orient="index")
+	df.to_csv(os.path.join(save_done_training, f"{classifier_name}_{timestamp}.csv"))
 
 	# Save pipeline
-	classifier_name = f"{classifier_name}_{window_size}"
 	saving_dir = os.path.join(path_save, classifier_name) if classifier_name.lower() not in path_save.lower() else path_save
-	save_classifier(classifier, saving_dir, fname=None)
+	saved_model_path = save_classifier(classifier, saving_dir, fname=None)
 
-	# Can't run model evaluation if no test set
-	if not eval_model:
-		return
-	elif len(test_indexes) == 0:
-		raise ValueError('No test set given for evaluating the model')
-
-	# Load metrics
-	metricsloader = MetricsLoader(TSB_metrics_path)
-	metrics = metricsloader.get_names()
-
-	# Evaluating the model
-	# test_indexes = test_indexes[:10]
-	for metric in metrics:
-		metric_values = metricsloader.read(metric=metric).loc[test_indexes][detector_names]
-		inf_time = []
-		all_preds = []
-		pred_scores = []
-		for fname in tqdm(test_indexes, desc=f'Computing {metric}'):
-			# Load the data (already loaded just collecting them)
-			x = X_test.filter(like=fname, axis=0)
-			y = y_test.filter(like=fname, axis=0)
-
-			# Predict time series
-			tic = perf_counter()
-			preds = classifier.predict(x)
-			counter = Counter(preds)
-			most_voted = counter.most_common(1)
-			toc = perf_counter()
-
-			# Save info
-			inf_time.append(toc-tic)
-			all_preds.append(detector_names[int(most_voted[0][0])])
-			pred_scores.append(metric_values.loc[fname].iloc[int(most_voted[0][0])])
-
-		# Create df
-		curr_metrics = pd.DataFrame(data=zip(pred_scores, all_preds, inf_time), columns=["score", "class", "inf"], index=test_indexes)
-		curr_metrics.columns = ["{}_{}".format(classifier_name, x) for x in curr_metrics.columns.values]
-
-		# Print results
-		print(curr_metrics)
-
-		# Save scores file (already exist in demo but uncomment if you want to reproduce them - fill in PATH)
-		# file_name = os.path.join("PATH", metric, "{}_{}.csv".format(classifier_name, metric))
-		# curr_metrics.to_csv(file_name)
+	# Evaluate on test set or val set
+	if eval_model:
+		eval_set = test_indexes if len(test_indexes) > 0 else val_indexes
+		eval_feature_based(
+			data_path=data_path, 
+			model_name=classifier_name,
+			model_path=saved_model_path,
+			path_save=path_save_results,
+			fnames=eval_set,
+		)
 
 
 if __name__ == "__main__":

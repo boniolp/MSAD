@@ -16,6 +16,7 @@ from collections import Counter
 from time import perf_counter
 from tqdm import tqdm
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 from utils.timeseries_dataset import TimeseriesDataset
 from utils.config import *
@@ -38,7 +39,6 @@ class Evaluator:
 		data_path,
 		batch_size=64,
 		deep_model=True,
-		inf_time=False
 	):
 		"""Predict function for all the models
 
@@ -48,7 +48,6 @@ class Evaluator:
 			(please check that path and fnames together make the complete path)
 		:param batch_size: the batch size used to make the predictions
 		:param deep_model:
-		:param inf_time:
 		:return df: dataframe with timeseries and predictions per time series
 		"""
 
@@ -72,6 +71,7 @@ class Evaluator:
 				fnames=[fname],
 				verbose=False
 			)
+
 			if deep_model:
 				tic = perf_counter()
 				preds = self.predict_timeseries(model, data, batch_size=batch_size, device='cuda')
@@ -104,6 +104,10 @@ class Evaluator:
 			# Move data to the same device as model
 			inputs = inputs.to(device)
 			labels = labels.to(device)
+			print(inputs.cpu().numpy()[0, 0])
+			plt.plot(inputs.cpu().numpy()[0, 0])
+			plt.show()
+			exit()
 			
 			# Make predictions
 			outputs = model(inputs.float())

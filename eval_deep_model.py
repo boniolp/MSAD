@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader
 
 from utils.config import *
 from utils.train_deep_model_utils import json_file
-from utils.timeseries_dataset import read_files
+from utils.timeseries_dataset import read_files, create_splits
 from utils.evaluator import Evaluator
 
 
@@ -28,8 +28,8 @@ def eval_deep_model(
 	model_path=None, 
 	model_parameters_file=None, 
 	path_save=None, 
-	fnames=None, 
-	inf_time=True,
+	fnames=None,
+	read_from_file=None,
 	model=None
 ):
 	"""Given a model and some data it predicts the time series given
@@ -40,7 +40,6 @@ def eval_deep_model(
 	:param model_parameters_file:
 	:param path_save:
 	:param fnames:
-	:param inf_time:
 	"""
 	window_size = int(re.search(r'\d+', str(data_path)).group())
 	batch_size = 128
@@ -48,7 +47,11 @@ def eval_deep_model(
 	assert(
 		(model is not None) or \
 		(model_path is not None and model_parameters_file is not None)
-	), "You should provide the function with a model or a path to the model"
+	), "You should provide the model or the path to the model, not both"
+
+	assert(
+		not (fnames is not None and read_from_file is not None)
+	), "You should provide either the fnames or the path to the specific splits, not both"
 
 	# Load the model only if not provided
 	if model == None:
@@ -60,22 +63,31 @@ def eval_deep_model(
 		model.load_state_dict(torch.load(model_path))
 		model.to('cuda')	
 
-	# Read data (single csv file or directory with csvs)
-	if '.csv' == data_path[-len('.csv'):]:
-		tmp_fnames = [data_path.split('/')[-1]]
-		data_path = data_path.split('/')[:-1]
-		data_path = '/'.join(data_path)
+	# Load the splits
+	if read_from_file is not None:
+		_, val_set, test_set = create_splits(
+			data_path,
+			read_from_file=read_from_file,
+		)
+		fnames = test_set if len(test_set) > 0 else val_set
+		fnames = fnames[:100]
 	else:
-		tmp_fnames = read_files(data_path)
+		# Read data (single csv file or directory with csvs)
+		if '.csv' == data_path[-len('.csv'):]:
+			tmp_fnames = [data_path.split('/')[-1]]
+			data_path = data_path.split('/')[:-1]
+			data_path = '/'.join(data_path)
+		else:
+			tmp_fnames = read_files(data_path)
 
-	# Keep specific time series if fnames is given
-	if fnames is not None:
-		fnames_len = len(fnames)
-		fnames = [x for x in tmp_fnames if x in fnames]
-		if len(fnames) != fnames_len:
-			raise ValueError("The data path does not include the time series in fnames")
-	else:
-		fnames = tmp_fnames
+		# Keep specific time series if fnames is given
+		if fnames is not None:
+			fnames_len = len(fnames)
+			fnames = [x for x in tmp_fnames if x in fnames]
+			if len(fnames) != fnames_len:
+				raise ValueError("The data path does not include the time series in fnames")
+		else:
+			fnames = tmp_fnames
 
 	# Evaluate model
 	evaluator = Evaluator()
@@ -85,13 +97,12 @@ def eval_deep_model(
 		fnames=fnames,
 		data_path=data_path,
 		deep_model=True,
-		inf_time=inf_time
 	)
 	results.columns = [f"{classifier_name}_{x}" for x in results.columns.values]
 	
 	# Print results
 	print(results)
-
+	
 	# Save the results
 	if path_save is not None:
 		file_name = os.path.join(path_save, f"{classifier_name}_preds.csv")
@@ -110,6 +121,7 @@ if __name__ == "__main__":
 	parser.add_argument('-mp', '--model_path', type=str, help='path to the trained model', required=True)
 	parser.add_argument('-pa', '--params', type=str, help="a json file with the model's parameters", required=True)
 	parser.add_argument('-ps', '--path_save', type=str, help='path to save the results', default="results/raw_predictions")
+	parser.add_argument('-f', '--file', type=str, help='path to file that contains a specific split', default=None)
 
 	args = parser.parse_args()
 	eval_deep_model(
@@ -117,5 +129,6 @@ if __name__ == "__main__":
 		model_name=args.model, 
 		model_path=args.model_path, 
 		model_parameters_file=args.params,
-		path_save=args.path_save
+		path_save=args.path_save,
+		read_from_file=args.file
 	)

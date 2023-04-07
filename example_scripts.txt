@@ -10,8 +10,11 @@ python3 generate_features.py --path=data/TSB_512/
 
 python3 train_deep_model.py --path=data/TSB_512/ --split=0.7 --file=experiments/supervised_splits/split_TSB_512.csv --model=resnet --params=models/configuration/resnet_default.json --batch=256 --epochs=10 --eval-true
 
+# To run whole folder of csv
 python3 eval_deep_model.py --data=data/TSB_512/MGAB/ --model=convnet --model_path=results/weights/supervised/convnet_default_512/model_30012023_173428 --params=models/configuration/convnet_default.json --path_save=results/raw_predictions/
 
+# To reproduce our results
+python3 eval_deep_model.py --data=data/TSB_512/ --model=convnet --model_path=results/weights/supervised/convnet_default_512/model_30012023_173428 --params=models/configuration/convnet_default.json --path_save=results/raw_predictions/ --file=experiments/supervised_splits/split_TSB_512.csv
 
 --------------------------------------- Rocket ---------------------------------------
 

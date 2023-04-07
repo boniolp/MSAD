@@ -104,11 +104,7 @@ class Evaluator:
 			# Move data to the same device as model
 			inputs = inputs.to(device)
 			labels = labels.to(device)
-			print(inputs.cpu().numpy()[0, 0])
-			plt.plot(inputs.cpu().numpy()[0, 0])
-			plt.show()
-			exit()
-			
+
 			# Make predictions
 			outputs = model(inputs.float())
 

@@ -52,7 +52,8 @@ def create_splits(data_path, split_per=0.7, seed=None, read_from_file=None):
 	train_set = []
 	val_set = []
 	test_set = []
-	dir_path = os.path.split(data_path)[0]
+	# dir_path = os.path.split(data_path)[0]
+	dir_path = data_path
 	
 	# Set seed if provided
 	if seed: 

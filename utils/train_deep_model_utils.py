@@ -243,6 +243,7 @@ class ModelExecutioner:
 			# Early stopping
 			if (epoch > 3 and early_stopper.early_stop_acc(avg_val_acc)) or ((perf_counter()-tic) > 70000):
 				break
+				
 		# Collect the results
 		results = {
 			'n_epochs': epoch + 1,

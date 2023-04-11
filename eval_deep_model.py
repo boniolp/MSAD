@@ -100,7 +100,7 @@ def eval_deep_model(
 		data_path=data_path,
 		deep_model=True,
 	)
-	results.sort_index()
+	results = results.sort_index()
 	results.columns = [f"{classifier_name}_{x}" for x in results.columns.values]
 	
 	# Print results

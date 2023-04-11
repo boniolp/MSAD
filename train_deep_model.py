@@ -94,10 +94,10 @@ def train_deep_model(
 
 	# Run training procedure
 	model, results = model_execute.train(
-			n_epochs=epochs, 
-			training_loader=training_loader, 
-			validation_loader=validation_loader, 
-			verbose=True,
+		n_epochs=epochs, 
+		training_loader=training_loader, 
+		validation_loader=validation_loader, 
+		verbose=True,
 	)
 
 	# Save training stats

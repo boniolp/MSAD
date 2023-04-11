@@ -12,6 +12,7 @@
 import argparse
 import re
 import os
+from collections import Counter
 
 import torch
 from torch.utils.data import DataLoader
@@ -61,6 +62,7 @@ def eval_deep_model(
 		# Load model
 		model = deep_models[model_name](**model_parameters)
 		model.load_state_dict(torch.load(model_path))
+		model.eval()
 		model.to('cuda')	
 
 	# Load the splits
@@ -70,7 +72,7 @@ def eval_deep_model(
 			read_from_file=read_from_file,
 		)
 		fnames = test_set if len(test_set) > 0 else val_set
-		fnames = fnames[:100]
+		# fnames = fnames[:100]
 	else:
 		# Read data (single csv file or directory with csvs)
 		if '.csv' == data_path[-len('.csv'):]:
@@ -98,10 +100,13 @@ def eval_deep_model(
 		data_path=data_path,
 		deep_model=True,
 	)
+	results.sort_index()
 	results.columns = [f"{classifier_name}_{x}" for x in results.columns.values]
 	
 	# Print results
 	print(results)
+	counter = Counter(results[f"{model_name}_{window_size}_class"])
+	print(dict(counter))
 	
 	# Save the results
 	if path_save is not None:

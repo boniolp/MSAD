@@ -127,6 +127,7 @@ class ModelExecutioner:
 	def evaluate(self, dataloader):
 		all_loss = []
 		all_acc = []
+		all_acc_top_k = []
 		 
 		# Switch model to eval mode
 		self.model.eval()
@@ -153,12 +154,12 @@ class ModelExecutioner:
 				loss = self.criterion(outputs.float(), labels.long())
 				
 				# Compute top k accuracy
-				mean_acc_top_k = self.compute_topk_acc(outputs, labels, 4)
+				acc_top_k = self.compute_topk_acc(outputs, labels, k=4)
 
-				
 				all_loss.append(loss.item())
-				all_acc.append(mean_acc_top_k[1])
-				
+				all_acc.append(acc_top_k[1])
+				all_acc_top_k.append(acc_top_k)
+
 				# Report on progress bar
 				if i % 10 == 9:
 					loop.set_postfix(
@@ -166,7 +167,7 @@ class ModelExecutioner:
 						val_acc=np.mean(all_acc),
 					)
 
-		return np.mean(all_loss), np.mean(all_acc), mean_acc_top_k
+		return np.mean(all_loss), np.mean(all_acc), all_acc_top_k
 
 
 	def train(self, n_epochs, training_loader, validation_loader, verbose=True):
@@ -211,14 +212,15 @@ class ModelExecutioner:
 			# Run model on validation data to evaluate
 			avg_val_loss, avg_val_acc, val_topk_acc = self.evaluate(validation_loader)
 
-			avg_val_top2 = np.mean(val_topk_acc[2])
-			avg_val_top3 = np.mean(val_topk_acc[3])
-			avg_val_top4 = np.mean(val_topk_acc[4])
+			avg_val_top1 = np.mean([x[1] for x in val_topk_acc])
+			avg_val_top2 = np.mean([x[2] for x in val_topk_acc])
+			avg_val_top3 = np.mean([x[3] for x in val_topk_acc])
+			avg_val_top4 = np.mean([x[4] for x in val_topk_acc])
 
 			# Epoch reporting
 			print(
-				"Epoch [{}/{}] {:.2f}secs : acc: {:.3f}, val_acc: {:.3f}, loss: {:.3f}, val_loss: {:.3f}, top k val_acc: k=2: {:.3f} k=3: {:.3f} k=4: {:.3f}"\
-				.format(epoch, n_epochs, perf_counter()-tic, avg_acc, avg_val_acc, avg_loss, avg_val_loss, avg_val_top2, avg_val_top3, avg_val_top4)
+				"Epoch [{}/{}] {:.2f}secs : acc: {:.3f}, val_acc: {:.3f}, loss: {:.3f}, val_loss: {:.3f}, top k val_acc: k=1: {:.3f} k=2: {:.3f} k=3: {:.3f} k=4: {:.3f}"\
+				.format(epoch, n_epochs, perf_counter()-tic, avg_acc, avg_val_acc, avg_loss, avg_val_loss, avg_val_top1, avg_val_top2, avg_val_top3, avg_val_top4)
 			)
 			
 			# Log the running loss averaged per batch
@@ -261,17 +263,17 @@ class ModelExecutioner:
 			'''Compute top k accuracy'''
 			mean_acc_top_k = {k:[] for k in range(1, k+1)}
 
-			_, y_pred = outputs.topk(k=k+1, dim=1)  # _, [B, n_classes] -> [B, maxk]
-			y_pred = y_pred.t() 
+			_, y_pred = outputs.topk(k=k, dim=1)  # _, [B, n_classes] -> [B, maxk]
+			y_pred = y_pred.t()
 			target_reshaped = labels.view(1, -1).expand_as(y_pred)
 			correct = (y_pred == target_reshaped)
 
 			for k in range(1, k+1):
-					ind_which_topk_matched_truth = correct[:k]  # [maxk, B] -> [k, B]
-					flattened_indicator_which_topk_matched_truth = ind_which_topk_matched_truth.reshape(-1).float()  # [k, B] -> [kB]
-					tot_correct_topk = flattened_indicator_which_topk_matched_truth.float().sum(dim=0, keepdim=True)  # [kB] -> [1]
-					topk_acc = tot_correct_topk / labels.size(0)  # topk accuracy for entire batch
-					mean_acc_top_k[k].append(topk_acc.item())
+				ind_which_topk_matched_truth = correct[:k]  # [maxk, B] -> [k, B]
+				flattened_indicator_which_topk_matched_truth = ind_which_topk_matched_truth.reshape(-1).float()  # [k, B] -> [kB]
+				tot_correct_topk = flattened_indicator_which_topk_matched_truth.float().sum(dim=0, keepdim=True)  # [kB] -> [1]
+				topk_acc = tot_correct_topk / labels.size(0)  # topk accuracy for entire batch
+				mean_acc_top_k[k].append(topk_acc.item())
 
 			return mean_acc_top_k
 

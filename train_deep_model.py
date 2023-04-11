@@ -114,7 +114,6 @@ def train_deep_model(
 			model_name=model_name,
 			model=model,
 			path_save=path_save_results,
-			inf_time=inf_time,
 		)
 	
 

@@ -79,9 +79,18 @@ def create_tmp_dataset(
 
 	# Keep only the metrics of the detectors (remove oracles)
 	metrics_data = metrics_data[detector_names]
-	
+
 	# Split timeseries and compute labels
 	ts_list, labels = split_and_compute_labels(x, metrics_data, window_size)
+
+	# Uncomment to check the results
+	# fig, axs = plt.subplots(2, 1, sharex=True)
+	# x_new = np.concatenate(ts_list[3])
+	# print(np.mean(x_new))
+	# print(np.std(x_new))
+	# axs[0].plot(x_new)
+	# axs[1].plot(x[3])
+	# plt.show()
 
 	# Create subfolder for each dataset
 	for dataset in datasets:

@@ -17,7 +17,7 @@ from utils.timeseries_dataset import read_files
 from utils.evaluator import Evaluator, load_classifier
 
 
-def eval_rocket(data_path, model_path, path_save=None, fnames=None, inf_time=True):
+def eval_rocket(data_path, model_path, path_save=None, fnames=None):
 	"""Predict some time series with the given rocket model
 
 	:param data_path: path to the data to predict
@@ -55,7 +55,6 @@ def eval_rocket(data_path, model_path, path_save=None, fnames=None, inf_time=Tru
 		fnames=fnames,
 		data_path=data_path,
 		deep_model=False,
-		inf_time=inf_time
 	)
 	results.columns = [f"{classifier_name}_{x}" for x in results.columns.values]
 	
@@ -79,12 +78,10 @@ if __name__ == "__main__":
 	parser.add_argument('-d', '--data', type=str, help='path to the time series to predict', required=True)
 	parser.add_argument('-mp', '--model_path', type=str, help='path to the trained model', required=True)
 	parser.add_argument('-ps', '--path_save', type=str, help='path to save the results', default="results/raw_predictions")
-	parser.add_argument('-i', '--inference-true', action="store_true", help='whether to save inference time')
 
 	args = parser.parse_args()
 	eval_rocket(
 		data_path=args.data, 
 		model_path=args.model_path,
 		path_save=args.path_save,
-		inf_time=args.inference_true
 	)

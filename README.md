@@ -60,6 +60,7 @@ pip install -r requirements.txt
 ```
 
 ## Usage
+Below you will find a step-by-step guide on how to use our work. This includes the commands required to run the scripts along with a small explanation of what they do and the parameters they use. The value of the parameters are just examples and you can play around with different values.
 
 #### Compute Oracle
 The Oracle (in white in the results figure at the end) is a hypothetical model that simulates the accuracy of a model on a given benchmark and evaluates its anomaly detection ability. Oracle can be simulated with different accuracy values, ranging from 1 (always selects the best detector for a time series) to zero (always selects a wrong detector). Additonally, Oracle can simulate different modes of randomness, namely:

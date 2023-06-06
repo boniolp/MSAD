@@ -198,7 +198,7 @@ python3 eval_feature_based.py --data=data/TSB_512/TSFRESH_TSB_512.csv --model=kn
 We propose a benchmark and an evaluation of 16 time series classifiers used as model selection methods (with 12 anomaly detectors to be selected) applied on 16 datasets from different domains. Our pipeline can be summarized in the following figure.
 
 <p align="center">
-<img width="1000" src="./assets/figures/pipeline.jpg"/>
+<img width="1000" src="./assets/figures/3_pipeline.jpg"/>
 </p>
 
 In the following section, we describe the datasets, anomaly detectors, and time series classification methods considered in our benchmark and evaluation.
@@ -285,7 +285,7 @@ We consider 16 time series classification (TSC) algtorithms used as model select
 We report in the following figure the average VUS-PR and inference time (i.e., predicting the detector to run and running it) for all detectors, the Oracle (the theoretical best model selection methods, in white), the Averaging Ensembling (in green), and the best time series classification used as model selection (in red). 
 
 <p align="center">
-<img width="500" src="./assets/figures/intro_fig.jpg"/>
+<img width="500" src="./assets/figures/1_intro_fig.jpg"/>
 </p>
 
 This figure and many others comparisons are described (and reproductible) in [these notebook](https://github.com/boniolp/MSAD/tree/main/experiments/accuracy_analysis), summarized in [this document](TODO).

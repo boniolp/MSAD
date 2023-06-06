@@ -59,6 +59,139 @@ conda activate MSAD
 pip install -r requirements.txt
 ```
 
+## Usage
+
+#### Compute Oracle
+The Oracle (in white in the results figure at the end) is a hypothetical model that simulates the accuracy of a model on a given benchmark and evaluates its anomaly detection ability. Oracle can be simulated with different accuracy values, ranging from 1 (always selects the best detector for a time series) to zero (always selects a wrong detector). Additonally, Oracle can simulate different modes of randomness, namely:
+1) true - when wrong, randomly select another detector,
+2) lucky - when wrong, always select the second best detector (upper bound),
+3) unlucky - when wrong, always select the worst detector (lower bound),
+4) best-k - when wrong, always select the kth detector (e.g. best-2 is lucky)
+
+To compute Oracle run the following command:
+
+```bash
+python3 run_oracle.py --path=data/TSB/metrics/ --acc=1 --randomnes=true
+```
+- path: path to metrics (the results will be saved here)
+- acc: the accuracy that you want to simulate (float between 0 and 1)
+- randomness: the randomness that you want to simulate (see possible modes above)
+
+#### Compute Average Ensembling
+The Average Ensembling, or Avg Ens (in orange in the results figure at the end) is to ensemble the anomaly scores produced by all the detectors, that is, to compute their average. Then, the AUC-PR and the VUS-PR metrics are computed for the resulted score.
+
+To compute Avg Ens run the following command:
+```bash
+python3 run_avg_ens.py --n_jobs=16
+```
+- n_jobs: threads to use for parallel computation
+
+#### Data Preprocessing
+Our models have been implemented so that the input is of a fixed size. Thus, before we run any models, we first devide every dataset in the TSB benchmark into windows. Note that you can add your own time series here and divide them into windows, just make sure to follow the same format.
+
+To produce a windowed dataset, run the following command:
+```bash
+python3 create_windows_dataset.py --save_dir=data/ --path=data/TSB/data/ --metric_path=data/TSB/metrics/ --window_size=512 --metric=AUC_PR
+```
+- save_dir: path to save the dataset
+- path: path of the dataset to divide into windows
+- metric_path: path to the metrics of the dataset given (to produce the labels)
+- window_size: window size (if window size bigger than the time series' length then this time series is skipped)
+- metric: metric to use to produce the labels (AUC-PR, VUS-PR, AUC-ROC, VUS-ROC)
+
+The feature-based methods, require a set of features to be computed first and turn the time series into tabular data. To this goal we use the TSFresh module that computes a predifined set of features.
+
+To compute the set of features for a segmented dataset run the following command:
+```bash
+python3 generate_features.py --path=data/TSB_512/
+```
+--path: path to the dataset to compute the features (the dataset should be segmented first into windows - see the command above), the resulting dataset is saved in the same dir
+
+#### Deep Learning Architectures
+
+To train a model, run the following command:
+```bash
+python3 train_deep_model.py --path=data/TSB_512/ --split=0.7 --file=experiments/supervised_splits/split_TSB_512.csv --model=resnet --params=models/configuration/resnet_default.json --batch=256 --epochs=10 --eval-true
+```
+- path: path to the dataset to use
+- split: split percentage for train and val sets
+- seed: Seed for train/val split
+- file: path to file that contains a specific split (to reproduce our results)
+- model: model to run (type of architecture)
+- params: a json file with the model's parameters
+- batch: batch size
+- epochs: number of epochs
+- eval-true: whether to evaluate the model on test data after training
+
+To evaluate a model on a folder of csv files, run the following command:
+```bash
+python3 eval_deep_model.py --data=data/TSB_512/MGAB/ --model=convnet --model_path=results/weights/supervised/convnet_default_512/model_30012023_173428 --params=models/configuration/convnet_default.json --path_save=results/raw_predictions/
+```
+- data: path to the time series to predict
+- model: model to run
+- model_path: path to the trained model
+- params: a json file with the model's parameters
+- path_save: path to save the results
+
+To reproduce our results, run the following command:
+```bash
+python3 eval_deep_model.py --data=data/TSB_512/ --model=convnet --model_path=results/weights/supervised/convnet_default_512/model_30012023_173428 --params=models/configuration/convnet_default.json --path_save=results/raw_predictions/ --file=experiments/supervised_splits/split_TSB_512.csv
+```
+- file: path to file that contains a specific split (to reproduce our results)
+
+#### Rocket
+
+To train a Rocket model, run the following command:
+```bash
+python3 train_rocket.py --path=data/TSB_512/ --split_per=0.7 --file=experiments/supervised_splits/split_TSB_512.csv --eval-true --path_save=results/weights/supervised/
+```
+- path: path to the dataset to use
+- split_per: split percentage for train and val sets
+- seed: seed for splitting train, val sets (use small number)
+- file: path to file that contains a specific split
+- eval-true: whether to evaluate the model on test data after training
+- path_save: path to save the trained classifier
+
+To evaluate a Rocket model, run the following command:
+```bash
+python3 eval_rocket.py --data=data/TSB_512/KDD21/ --model_path=results/weights/supervised/rocket_512/ --path_save=results/raw_predictions/
+```
+- data: path to the time series to predict
+- model_path: path to the trained model
+- path_save: path where to save the results
+
+#### Feature-Based
+list of classifiers:
+- knn
+- svc_linear
+- decision_tree
+- random_forest
+- mlp
+- ada_boost
+- bayes
+- qda
+
+To train any of these classifiers, run the following command:
+```bash
+python3 train_feature_based.py --path=data/TSFRESH_TSB_512.csv --classifier=knn --split_per=0.7 --file=experiments/unsupervised_splits/unsupervised_testsize_1_split_0.csv --eval-true --path_save=results/weights/
+```
+- path: path to the dataset to use
+- classifier: classifier to run
+- split_per: split percentage for train and val sets
+- seed: seed for splitting train, val sets (use small number)
+- file: path to file that contains a specific split
+- eval-true: whether to evaluate the model on test data after training
+- path_save: path to save the trained classifier
+
+To evaluate a classifier, run the following command:
+```bash
+python3 eval_feature_based.py --data=data/TSB_512/TSFRESH_TSB_512.csv --model=knn --model_path=results/weights/knn_512/ --path_save=results/raw_predictions/
+```
+- data: path to the time series to predict
+- model: model to run
+- model_path: path to the trained model
+- path_save: path to save the results
+
 ## Model Selection Pipeline
 
 We propose a benchmark and an evaluation of 16 time series classifiers used as model selection methods (with 12 anomaly detectors to be selected) applied on 16 datasets from different domains. Our pipeline can be summarized in the following figure.

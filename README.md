@@ -78,8 +78,8 @@ python3 run_oracle.py --path=data/TSB/metrics/ --acc=1 --randomnes=true
 - acc: the accuracy that you want to simulate (float between 0 and 1)
 - randomness: the randomness that you want to simulate (see possible modes above)
 
-#### Compute Average Ensembling
-The Average Ensembling, or Avg Ens (in orange in the results figure at the end) is to ensemble the anomaly scores produced by all the detectors, that is, to compute their average. Then, the AUC-PR and the VUS-PR metrics are computed for the resulted score.
+#### Compute Averaging Ensemble
+The Averaging Ensemble, or Avg Ens (in orange in the results figure at the end) is to ensemble the anomaly scores produced by all the detectors, that is, to compute their average. Then, the AUC-PR and the VUS-PR metrics are computed for the resulted score.
 
 To compute Avg Ens run the following command:
 ```bash

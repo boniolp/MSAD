@@ -55,81 +55,97 @@ The following tools are required to install MSAD from source:
 
 #### Steps
 
-1. First, due to limitations in the upload size on GitHub, we host the datasets and pretrained models at a different location. Please download the datasets using the following links:
-
-- datasets: https://drive.google.com/file/d/1PQKwu5lZTnTmsmms1ipko9KF712Oc5DE/view?usp=share_link
-
-- models: https://drive.google.com/file/d/1YjZTeFOhgkDbj_62MncSLNDmuHmXhWZC/view?usp=sharing
-
-Unzip the files and move the datasets (i.e., TSB/ folder) in data/, and move the models files (i.e., the contents of the unzipped file called weight) in weights/ folder in the repo.
-
-2. Clone this repository using git and change into its root directory.
+**1.** Clone this repository using git and change into its root directory.
 
 ```bash
 git clone https://github.com/boniolp/MSAD.git
 cd MSAD/
 ```
 
-3. Create and activate a conda-environment 'MSAD'.
+**2.** Download the datasets and the weights using the following links (due to upload size limitations on GitHub, we host them on Google Drive): 
+
+- datasets: https://drive.google.com/file/d/1PQKwu5lZTnTmsmms1ipko9KF712Oc5DE/view?usp=share_link
+> Move _TSB.zip_ into _/MSAD/data_, and unzip it.
+
+- weights: https://drive.google.com/file/d/1YjZTeFOhgkDbj_62MncSLNDmuHmXhWZC/view?usp=sharing
+> Unzip _weights.zip_, and move its contents (_supervised_, _unsupervised_) into _/MSAD/results/weights_.
+
+
+**3.** Create and activate a conda-environment 'MSAD'.
 
 ```bash
 conda env create --file environment.yml
 conda activate MSAD
 ```
+> The environment should be ready with all the requirements installed (except CUDA, if you want to use the GPU you should install CUDA manually).
    
-4. Install the dependencies from `requirements.txt`:
+If you dont want to install the conda environment, you can install only the dependencies from `requirements.txt`:
 ```
 pip install -r requirements.txt
 ```
 
+**4.** :clap: Installation complete! :clap:
+
 ## Usage
-Below you will find a step-by-step guide on how to use our work. This includes the commands required to run the scripts along with a small explanation of what they do and the parameters they use. The value of the parameters are just examples and you can play around with different values.
+Below, you will find a step-by-step guide on how to use our work. This includes the commands required to run the scripts along with a small explanation of what they do and the parameters they use. The values of the parameters in the scripts are just examples, and you can experiment with different values.
 
 #### Compute Oracle
-The Oracle (in white in the results figure at the end) is a hypothetical model that simulates the accuracy of a model on a given benchmark and evaluates its anomaly detection ability. Oracle can be simulated with different accuracy values, ranging from 1 (always selects the best detector for a time series) to zero (always selects a wrong detector). Additonally, Oracle can simulate different modes of randomness, namely:
-1) true - when wrong, randomly select another detector,
-2) lucky - when wrong, always select the second best detector (upper bound),
-3) unlucky - when wrong, always select the worst detector (lower bound),
-4) best-k - when wrong, always select the kth detector (e.g. best-2 is lucky)
+The Oracle (shown in white in the results figure at the end) is a hypothetical model that simulates the accuracy of a model on a given benchmark and evaluates its anomaly detection ability. You can simulate Oracle with different accuracy values, ranging from 1 (always selecting the best detector for a time series) to zero (always selecting a wrong detector). Additionally, you can simulate Oracle with different modes of randomness, namely:
 
-To compute Oracle run the following command:
+1) **true**: When wrong, randomly select another detector.
+2) **lucky**: When wrong, always select the second best detector (upper bound).
+3) **unlucky**: When wrong, always select the worst detector (lower bound).
+4) **best-k**: When wrong, always select the k-th best detector (e.g., best-2 is lucky).
+
+To compute Oracle, run the following command:
 
 ```bash
 python3 run_oracle.py --path=data/TSB/metrics/ --acc=1 --randomnes=true
 ```
-- path: path to metrics (the results will be saved here)
-- acc: the accuracy that you want to simulate (float between 0 and 1)
-- randomness: the randomness that you want to simulate (see possible modes above)
+- path: Path to metrics (the results will be saved here).
+- acc: The accuracy that you want to simulate (a float between 0 and 1).
+- randomness: The randomness mode that you want to simulate (see possible modes above).
+
+> The results are saved in _/MSAD/data/TSB/metrics/TRUE_ORACLE-100/_ (the name of the last folder should change depending on the parameters).
 
 #### Compute Averaging Ensemble
-The Averaging Ensemble, or Avg Ens (in orange in the results figure at the end) is to ensemble the anomaly scores produced by all the detectors, that is, to compute their average. Then, the AUC-PR and the VUS-PR metrics are computed for the resulted score.
+The Averaging Ensemble, or Avg Ens (in orange in the results figure at the end), is used to ensemble the anomaly scores produced by all the detectors, by computing their average. Subsequently, the AUC-PR and the VUS-PR metrics are computed for the resulting score.
 
-To compute Avg Ens run the following command:
+To compute Avg Ens, run the following command:
 ```bash
 python3 run_avg_ens.py --n_jobs=16
 ```
-- n_jobs: threads to use for parallel computation
+- n_jobs: The number of threads to use for parallel computation (specify an appropriate value).
+
+> This process may take some time :smile: (~16 mins in 16 cores and 32GB of RAM). The script will perform the following tasks:
+> 1. Load all datasets from the TSB benchmark
+> 2. Load all the scores for each time series and detector (~ 1800 * 12 scores)
+> 3. Compute the average score for each time series for 4 metrics (AUC-ROC, AUC-PR, VUS-ROC, VUS-PR)
+> 4. Save the results in _/MSAD/data/TSB/metrics/AVG_ENS/_.
 
 #### Data Preprocessing
-Our models have been implemented so that the input is of a fixed size. Thus, before we run any models, we first devide every dataset in the TSB benchmark into windows. Note that you can add your own time series here and divide them into windows, just make sure to follow the same format.
+Our models have been implemented to work with fixed-size inputs. Thus, before running any models, we first divide every time series in the TSB benchmark into windows. Note that you can add your own time series here and divide them into windows, but make sure to follow the same format.
 
 To produce a windowed dataset, run the following command:
 ```bash
 python3 create_windows_dataset.py --save_dir=data/ --path=data/TSB/data/ --metric_path=data/TSB/metrics/ --window_size=512 --metric=AUC_PR
 ```
-- save_dir: path to save the dataset
-- path: path of the dataset to divide into windows
-- metric_path: path to the metrics of the dataset given (to produce the labels)
-- window_size: window size (if window size bigger than the time series' length then this time series is skipped)
-- metric: metric to use to produce the labels (AUC-PR, VUS-PR, AUC-ROC, VUS-ROC)
 
-The feature-based methods, require a set of features to be computed first and turn the time series into tabular data. To this goal we use the TSFresh module that computes a predifined set of features.
+- save_dir: Path to save the dataset.
+- path: Path of the dataset to divide into windows.
+- metric_path: Path to the metrics of the dataset provided (to produce the labels).
+- window_size: Window size (if the window size is larger than the time series' length, that time series is skipped).
+- metric: Metric to use for producing the labels (AUC-PR, VUS-PR, AUC-ROC, VUS-ROC).
 
-To compute the set of features for a segmented dataset run the following command:
+The feature-based methods require a set of features to be computed first, turning the time series into tabular data. To achieve this, we use the TSFresh module, which computes a predefined set of features.
+
+To compute the set of features for a segmented dataset, run the following command:
 ```bash
 python3 generate_features.py --path=data/TSB_512/
 ```
---path: path to the dataset to compute the features (the dataset should be segmented first into windows - see the command above), the resulting dataset is saved in the same dir
+- path: Path to the dataset for computing the features (the dataset should be segmented first into windows; see the command above). The resulting dataset is saved in the same directory (**MANDATORY**).
+
+> Note: This process is memory-intensive, and we required a minimum of 512GB of RAM to run it. If you encounter memory issues, optimizing the TSFresh library is not within the scope of this project.
 
 #### Deep Learning Architectures
 
@@ -137,31 +153,40 @@ To train a model, run the following command:
 ```bash
 python3 train_deep_model.py --path=data/TSB_512/ --split=0.7 --file=experiments/supervised_splits/split_TSB_512.csv --model=resnet --params=models/configuration/resnet_default.json --batch=256 --epochs=10 --eval-true
 ```
-- path: path to the dataset to use
-- split: split percentage for train and val sets
-- seed: Seed for train/val split
-- file: path to file that contains a specific split (to reproduce our results)
-- model: model to run (type of architecture)
-- params: a json file with the model's parameters
-- batch: batch size
-- epochs: number of epochs
-- eval-true: whether to evaluate the model on test data after training
+- path: Path to the dataset to use.
+- split: Split percentage for training and validation sets.
+- seed: Seed for train/val split (optional).
+- file: Path to a file that contains a specific split (to reproduce our results).
+- model: Model to use (type of architecture).
+- params: A JSON file with the model's parameters.
+- batch: Batch size.
+- epochs: Number of training epochs.
+- eval-true: Whether to evaluate the model on test data after training.
 
-To evaluate a model on a folder of csv files, run the following command:
+> This script will save the following:
+> - training specific information into _/MSAD/results/done_training/resnet_default_512_11092023_162841.csv_ file.
+> - TensorBoard data will be saved into _/MSAD/results/runs/resnet_default_512_11092023_162726/_.
+> - The trained weights will be saved in _/MSAD/results/weights/resnet_default_512/_.
+> - In case the 'eval-true' is selected, the results of the trained model on the test set will be saved in _/MSAD/results/raw_predictions/resnet_512_preds.csv_.
+
+To evaluate a model on a folder of CSV files, run the following command:
 ```bash
 python3 eval_deep_model.py --data=data/TSB_512/MGAB/ --model=convnet --model_path=results/weights/supervised/convnet_default_512/model_30012023_173428 --params=models/configuration/convnet_default.json --path_save=results/raw_predictions/
 ```
-- data: path to the time series to predict
-- model: model to run
-- model_path: path to the trained model
-- params: a json file with the model's parameters
-- path_save: path to save the results
+- data: Path to the time series data to predict.
+- model: Model to use.
+- model_path: Path to the trained model.
+- params: A JSON file with the model's parameters.
+- path_save: Path to save the results.
 
-To reproduce our results, run the following command:
+> The results of the above inference example are saved in _/MSAD/results/raw_predictions/convnet_512_preds.csv_.
+
+To reproduce our specific results, run the following command:
 ```bash
 python3 eval_deep_model.py --data=data/TSB_512/ --model=convnet --model_path=results/weights/supervised/convnet_default_512/model_30012023_173428 --params=models/configuration/convnet_default.json --path_save=results/raw_predictions/ --file=experiments/supervised_splits/split_TSB_512.csv
 ```
-- file: path to file that contains a specific split (to reproduce our results)
+- file: Path to a file that contains a specific split (to reproduce our results).
+
 
 #### Rocket
 
@@ -169,52 +194,57 @@ To train a Rocket model, run the following command:
 ```bash
 python3 train_rocket.py --path=data/TSB_512/ --split_per=0.7 --file=experiments/supervised_splits/split_TSB_512.csv --eval-true --path_save=results/weights/supervised/
 ```
-- path: path to the dataset to use
-- split_per: split percentage for train and val sets
-- seed: seed for splitting train, val sets (use small number)
-- file: path to file that contains a specific split
-- eval-true: whether to evaluate the model on test data after training
-- path_save: path to save the trained classifier
+- path: Path to the dataset to use.
+- split_per: Split percentage for training and validation sets.
+- seed: Seed for splitting training and validation sets (use a small number for reproducibility).
+- file: Path to a file that contains a specific split (if needed).
+- eval-true: Whether to evaluate the model on test data after training.
+- path_save: Path to save the trained classifier.
+
+> This process may take some time :smile: (~5 mins in 16 cores and 32GB of RAM). If 'eval-true' is selected, the results of the inference of the trained model will be saved in _/MSAD/results/raw_predictions/rocket_512_preds.csv_
 
 To evaluate a Rocket model, run the following command:
 ```bash
 python3 eval_rocket.py --data=data/TSB_512/KDD21/ --model_path=results/weights/supervised/rocket_512/ --path_save=results/raw_predictions/
 ```
-- data: path to the time series to predict
-- model_path: path to the trained model
-- path_save: path where to save the results
+- data: Path to the time series data to predict.
+- model_path: Path to the trained model.
+- path_save: Path to save the results.
 
 #### Feature-Based
-list of classifiers:
-- knn
-- svc_linear
-- decision_tree
-- random_forest
-- mlp
-- ada_boost
-- bayes
-- qda
+List of available classifiers:
+- **knn**
+- **svc_linear**
+- **decision_tree**
+- **random_forest**
+- **mlp**
+- **ada_boost**
+- **bayes**
+- **qda**
 
 To train any of these classifiers, run the following command:
 ```bash
-python3 train_feature_based.py --path=data/TSFRESH_TSB_512.csv --classifier=knn --split_per=0.7 --file=experiments/unsupervised_splits/unsupervised_testsize_1_split_0.csv --eval-true --path_save=results/weights/
+python3 train_feature_based.py --path=data/TSB_512/TSFRESH_TSB_512.csv --classifier=knn --split_per=0.7 --file=experiments/unsupervised_splits/unsupervised_testsize_1_split_0.csv --eval-true --path_save=results/weights/
 ```
-- path: path to the dataset to use
-- classifier: classifier to run
-- split_per: split percentage for train and val sets
-- seed: seed for splitting train, val sets (use small number)
-- file: path to file that contains a specific split
-- eval-true: whether to evaluate the model on test data after training
-- path_save: path to save the trained classifier
+- path: Path to the dataset to use.
+- classifier: Classifier to run.
+- split_per: Split percentage for training and validation sets.
+- seed: Seed for splitting training and validation sets (use a small number for reproducibility).
+- file: Path to a file that contains a specific split (if needed).
+- eval-true: Whether to evaluate the model on test data after training.
+- path_save: Path to save the trained classifier.
 
 To evaluate a classifier, run the following command:
 ```bash
 python3 eval_feature_based.py --data=data/TSB_512/TSFRESH_TSB_512.csv --model=knn --model_path=results/weights/knn_512/ --path_save=results/raw_predictions/
 ```
-- data: path to the time series to predict
-- model: model to run
-- model_path: path to the trained model
-- path_save: path to save the results
+- data: Path to the time series data to predict.
+- classifier: Classifier to run from the list above.
+- classifier_path: Path to the trained classifier model.
+- path_save: Path to save the results.
+
+> Note: To reproduce our results run the training script with the 'eval-true' option and the 'file' argument set to the specific splits we used (found in the _/MSAD/experiments/*_splits_ directories).
+
 
 ## Model Selection Pipeline
 

@@ -58,7 +58,7 @@ The following tools are required to install MSAD from source:
 
 - datasets: https://drive.google.com/file/d/1PQKwu5lZTnTmsmms1ipko9KF712Oc5DE/view?usp=share_link
 
-- models: [https://drive.google.com/file/d/14Tk_-npHIozLAYB-FAkHRtTn9CqaXwuE/view?usp=share_link](https://drive.google.com/file/d/1YjZTeFOhgkDbj_62MncSLNDmuHmXhWZC/view?usp=sharing)
+- models: https://drive.google.com/file/d/1YjZTeFOhgkDbj_62MncSLNDmuHmXhWZC/view?usp=sharing
 
 Unzip the files and move the datasets (i.e., TSB/ folder) in data/, and move the models files (i.e., the contents of the unzipped file called weight) in weights/ folder in the repo.
 

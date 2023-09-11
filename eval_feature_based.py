@@ -31,7 +31,7 @@ def eval_feature_based(data_path, model_name, model_path, path_save=None, fnames
 	:param data: data to call directly from another function with loaded data
 	"""
 	window_size = int(re.search(r'\d+', str(data_path)).group())
-	classifier_name = model_name
+	classifier_name = f"{model_name}_{window_size}" if str(window_size) not in model_name else model_name
 	all_preds = []
 	inf_time = []
 

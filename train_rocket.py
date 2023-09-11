@@ -39,7 +39,6 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	window_size = int(re.search(r'\d+', data_path).group())
 	classifier_name = f"rocket_{window_size}"
 	training_stats = {}
-	inf_time = True 		# compute inference time per timeseries
 
 	# Load the splits
 	train_set, val_set, test_set = create_splits(
@@ -131,7 +130,6 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 			model_path=saved_model_path,
 			path_save=path_save_results,
 			fnames=eval_set,
-			inf_time=inf_time,
 		)
 
 

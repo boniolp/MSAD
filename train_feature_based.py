@@ -61,11 +61,12 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 	# Set up
 	window_size = int(re.search(r'\d+', data_path).group())
 	training_stats = {}
-	inf_time = True 		# compute inference time per timeseries
+	original_dataset = data_path.split('/')[:-1]
+	original_dataset = '/'.join(original_dataset)
 	
 	# Load the splits
 	train_set, val_set, test_set = create_splits(
-		data_path,
+		original_dataset,
 		split_per=split_per,
 		seed=seed,
 		read_from_file=read_from_file,
@@ -167,7 +168,7 @@ if __name__ == "__main__":
 
 	for classifier in clf_list:
 		train_feature_based(
-			data_path=args.path, 
+			data_path=args.path,
 			classifier_name=classifier,
 			split_per=args.split_per, 
 			seed=args.seed,

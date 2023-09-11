@@ -3,8 +3,9 @@
 </p>
 
 
-<h1 align="center">MSAD</h1>
-<h2 align="center">Model Selection for Anomaly Detection in Time Series</h2>
+<h1 align="center">Choose Wisely
+</h1>
+<h2 align="center">An Extensive Evaluation of Model Selection for Anomaly Detection in Time Series</h2>
 
 <div align="center">
 <p>
@@ -13,7 +14,7 @@
 </div>
 
 
-<p align="center"><a href="https://adecimots.streamlit.app/">Try our demo</a></p>
+<p align="center"><a href="https://adecimots.streamlit.app/">Explore our results and test with your own data through our demo!</a></p>
 
 MSAD proposes a pipeline for model selection based on time series classification and an extensive experimental evaluation of existing classification algorithms for this new pipeline. Our results demonstrate that model selection methods outperform every single anomaly detection method while being in the same order of magnitude regarding execution time. You can click on our demo link above to get more information and navigate through our experimental evaluation.
 

@@ -331,12 +331,16 @@ We consider 16 time series classification (TSC) algtorithms used as model select
 
 ## Overview of the results
 
+In the following figure, we present a visual summary of the average VUS-PR and Detection time (i.e., predicting the detector to run and running it) for the components:
 
-We report in the following figure the average VUS-PR and inference time (i.e., predicting the detector to run and running it) for all detectors, the Oracle (the theoretical best model selection methods, in white), the Averaging Ensembling (in green), and the best time series classification used as model selection (in red). 
+- **All Detectors** (in grey): This category represents the individual detectors.
+- **Oracle** (in white): The Oracle represents the theoretical best model selection methods.
+- **Averaging Ensembling** (in orange): The Averaging Ensembling approach.
+- **Best Time Series Classification** (in blue): The best-performing time series classification model used for model selection.
 
-<p align="center">
-<img width="500" src="./assets/figures/jpg"/>
-</p>
+![Average VUS-PR and Detection Time](./assets/figures/1_intro_fig.jpg)
 
-This figure and many others comparisons are described (and reproductible) in [these notebook](https://github.com/boniolp/MSAD/tree/main/experiments/accuracy_analysis), summarized in [this document](TODO).
-The overall accuracy tables (for VUS-PR and AUC-PR) are [here](https://github.com/boniolp/MSAD/tree/main/results/accuracy), and the execution time tables (training, prediction, and inference) are [here](https://github.com/boniolp/MSAD/tree/main/results/execution_time).
+- The detailed comparisons and reproducible experiments are described in the [experiments/accuracy_analysis](https://github.com/boniolp/MSAD/tree/main/experiments/accuracy_analysis) notebook.
+- A summarized overview of the results can be found in this [demo](https://adecimots.streamlit.app/).
+- For comprehensive accuracy tables (VUS-PR and AUC-PR), please refer to the [accuracy results directory](https://github.com/boniolp/MSAD/tree/main/results/accuracy).
+- Detailed execution time tables, including training, prediction, and inference times, can be found in the [execution time results directory](https://github.com/boniolp/MSAD/tree/main/results/execution_time).

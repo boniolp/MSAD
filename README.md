@@ -20,16 +20,14 @@ MSAD proposes a pipeline for model selection based on time series classification
 
 If you use MSAD in your project or research, please cite the following paper:
 
-- [VLDB, 2023](https://www.researchgate.net/publication/373337385_Choose_Wisely_An_Extensive_Evaluation_of_Model_Selection_for_Anomaly_Detection_in_Time_Series)
+- [VLDB, 2023](https://dl.acm.org/doi/abs/10.14778/3611479.3611536)
 
 ### Reference
 
-> "Choose Wisely: An Extensive Evaluation of Model Selection for Anomaly Detection in Time Series"<br/>
-> Emmanouil Sylligardos, Paul Boniol, John Paparrizos, Panos Trahanias and Themis Palpanas.<br/>
-> Proceedings of the VLDB Endowment (**PVLDB 2023**) Journal, Volume 16(11), pages 3418-3432<br/>
+> Sylligardos, Emmanouil, et al. "Choose Wisely: An Extensive Evaluation of Model Selection for Anomaly Detection in Time Series." Proceedings of the VLDB Endowment 16.11 (2023): 3418-3432.
 
 ```bibtex
-@article{boniolMSAD2023,
+@article{sylligardos2023choose,
   title={Choose Wisely: An Extensive Evaluation of Model Selection for Anomaly Detection in Time Series},
   author={Sylligardos, Emmanouil and Boniol, Paul and Paparrizos, John and Trahanias, Panos and Palpanas, Themis},
   journal={Proceedings of the VLDB Endowment},
@@ -43,43 +41,42 @@ If you use MSAD in your project or research, please cite the following paper:
 
 ## Contributors
 
-* Emmanouil Sylligardos (ICS-FORTH)
-* Paul Boniol (Université Paris Cité)
+* **Emmanouil Sylligardos** (ICS-FORTH)
+* **Paul Boniol** (Université Paris Cité)
 
 ## Installation
 
-The following tools are required to install MSAD from source:
+To install MSAD from source, you will need the following tools:
+- `git`
+- `conda` (anaconda or miniconda)
 
-- git
-- conda (anaconda or miniconda)
+#### Steps for installation
 
-#### Steps
-
-**1.** Clone this repository using git and change into its root directory.
+**Step 1:** Clone this repository using `git` and change into its root directory.
 
 ```bash
 git clone https://github.com/boniolp/MSAD.git
 cd MSAD/
 ```
 
-**2.** Download the datasets and the weights using the following links (due to upload size limitations on GitHub, we host them on Google Drive): 
+**Step 2:** Download the required datasets and weights from the following links (due to upload size limitations on GitHub, we host them on Google Drive):
 
-- datasets: https://drive.google.com/file/d/1PQKwu5lZTnTmsmms1ipko9KF712Oc5DE/view?usp=share_link
-> Move _TSB.zip_ into _/MSAD/data_, and unzip it.
+- [Download datasets](https://drive.google.com/file/d/1PQKwu5lZTnTmsmms1ipko9KF712Oc5DE/view?usp=share_link)
+  - Move the downloaded file `TSB.zip` into the `MSAD/data/` directory and unzip it.
 
-- weights: https://drive.google.com/file/d/1YjZTeFOhgkDbj_62MncSLNDmuHmXhWZC/view?usp=sharing
-> Unzip _weights.zip_, and move its contents (_supervised_, _unsupervised_) into _/MSAD/results/weights_.
+- [Download weights](https://drive.google.com/file/d/1YjZTeFOhgkDbj_62MncSLNDmuHmXhWZC/view?usp=sharing)
+  - Unzip the downloaded `weights.zip` file and move its contents (`supervised/` and `unsupervised/`) into the `MSAD/results/weights/` directory.
 
 
-**3.** Create and activate a conda-environment 'MSAD'.
+**Step 3:** Create and activate a `conda` environment named `MSAD`.
 
 ```bash
 conda env create --file environment.yml
 conda activate MSAD
 ```
-> The environment should be ready with all the requirements installed (except CUDA, if you want to use the GPU you should install CUDA manually).
+> Note: If you plan to use GPU acceleration, please ensure that you have CUDA installed. You can refer to the [CUDA installation instructions](https://developer.nvidia.com/cuda-downloads) for guidance.
    
-If you dont want to install the conda environment, you can install only the dependencies from `requirements.txt`:
+If you do not wish to create the `conda` environment, you can install only the dependencies listed in `requirements.txt` using the following command:
 ```
 pip install -r requirements.txt
 ```

@@ -247,9 +247,9 @@ python3 eval_feature_based.py --data=data/TSB_512/TSFRESH_TSB_512.csv --model=kn
 
 We propose a benchmark and an evaluation of 16 time series classifiers used as model selection methods (with 12 anomaly detectors to be selected) applied on 16 datasets from different domains. Our pipeline can be summarized in the following figure.
 
-<p align="center">
-<img width="1000" src="./assets/figures/3_pipeline.jpg"/>
-</p>
+![Pipeline](./assets/figures/3_pipeline.jpg)
+
+
 
 In the following section, we describe the datasets, anomaly detectors, and time series classification methods considered in our benchmark and evaluation.
 
@@ -279,9 +279,8 @@ Briefly, TSB-UAD includes the following datasets:
 
 The figure below shows some typical outliers in these datasets.
 
-<p align="center">
-<img width="1000" src="./assets/figures/display_data.jpg"/>
-</p>
+![Outliers examples](./assets/figures/display_data.jpg)
+
 
 You may find more details (and the references) in the TSB-UAD benchmark [paper](https://www.paparrizos.org/papers/PaparrizosVLDB22a.pdf).
 

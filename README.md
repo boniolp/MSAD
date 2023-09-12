@@ -14,7 +14,7 @@
 </div>
 
 
-<p align="center"><a href="https://adecimots.streamlit.app/">Explore our results and test with your own data through our demo!</a></p>
+<p align="center"><a href="https://adecimots.streamlit.app/">**Adecimo**: Explore our results and test with your own data</a></p>
 
 MSAD proposes a pipeline for model selection based on time series classification and an extensive experimental evaluation of existing classification algorithms for this new pipeline. Our results demonstrate that model selection methods outperform every single anomaly detection method while being in the same order of magnitude regarding execution time. You can click on our demo link above to get more information and navigate through our experimental evaluation.
 

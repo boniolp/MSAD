@@ -61,6 +61,17 @@ def eval_deep_model(
 
 		# Load model
 		model = deep_models[model_name](**model_parameters)
+
+		# Check if model_path is specific file or dir
+		if os.path.isdir(model_path):
+			# Check the number of files in the directory
+			files = os.listdir(model_path)
+			if len(files) == 1:
+				# Load the single file from the directory
+				model_path = os.path.join(model_path, files[0])
+			else:
+				raise ValueError("Multiple files found in the 'model_path' directory. Please provide a single file or specify the file directly.")
+
 		if torch.cuda.is_available():
 			model.load_state_dict(torch.load(model_path))
 			model.eval()

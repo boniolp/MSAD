@@ -11,10 +11,10 @@
 
 import argparse
 import os
-# import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 from natsort import natsorted, ns
-# import seaborn as sns
+import seaborn as sns
 from tqdm import tqdm
 
 from models.model.oracle import Oracle
@@ -44,8 +44,20 @@ def create_oracle(path, acc=1, randomness='true'):
 		name = randomness.upper() + '_' + 'ORACLE-' + acc_str
 		metricsloader.write(score, files_names, name, metric)
 
-'''
 def eval_oracle(path):
+	"""
+    Function to evaluate Oracle performance based on AUC-PR values stored in CSV files within the given directory.
+
+    Parameters:
+    - path (str): The path to the directory containing Oracle files.
+
+    Returns:
+    - None
+
+    This function reads AUC-PR values from CSV files named 'AUC_PR.csv' within each Oracle directory in the specified path.
+    It merges these values into a single DataFrame and creates a boxplot to visualize the distribution of AUC-PR values
+    across different Oracle models. The boxplot is ordered based on the median AUC-PR values.
+    """
 	oracles = [os.path.join(path, x) for x in os.listdir(path) if 'ORACLE-' in x]
 
 	all_oracles = None
@@ -70,7 +82,7 @@ def eval_oracle(path):
 	plt.xticks(rotation=45)
 	plt.tight_layout()
 	plt.show()
-'''
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(
@@ -87,24 +99,27 @@ if __name__ == "__main__":
 	parser.add_argument('-r', '--randomness', type=str, default='true',
 		help='The randomness that you want to simulate'
 	)
+	parser.add_argument('--eval', action='store_true', help='Evaluate the oracles without creating new ones')
+	
 	args = parser.parse_args()
 
 	# Run single
-	if args.acc != 'all':
-		create_oracle(
-			path=args.path, 
-			acc=float(args.acc), 
-			randomness=args.randomness
-		)
-	elif args.acc == 'all':
-		acc_all = [1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0.00]
-		
-		for acc in tqdm(acc_all, desc='Oracle'):
+	if not args.eval:
+		if args.acc != 'all':
 			create_oracle(
-			path=args.path, 
-			acc=acc, 
-			randomness=args.randomness
-		)
-
-	# Evaluate with boxplot
-	# eval_oracle(path=args.path)
+				path=args.path, 
+				acc=float(args.acc), 
+				randomness=args.randomness
+			)
+		elif args.acc == 'all':
+			acc_all = [1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0.00]
+			
+			for acc in tqdm(acc_all, desc='Oracle'):
+				create_oracle(
+				path=args.path, 
+				acc=acc, 
+				randomness=args.randomness
+			)
+	else:
+		# Evaluate with boxplot
+		eval_oracle(path=args.path)

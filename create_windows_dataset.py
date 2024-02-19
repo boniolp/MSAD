@@ -201,16 +201,30 @@ if __name__ == "__main__":
 	parser.add_argument('-s', '--save_dir', type=str, help='path to save the dataset', required=True)
 	parser.add_argument('-p', '--path', type=str, help='path of the dataset to divide', required=True)
 	parser.add_argument('-mp', '--metric_path', type=str, help='path to the metrics of the dataset given', default=TSB_metrics_path)
-	parser.add_argument('-w', '--window_size', type=int, help='window size to segment the timeseries to', required=True)
+	parser.add_argument('-w', '--window_size', type=str, help='window size to segment the timeseries to', required=True)
 	parser.add_argument('-m', '--metric', type=str, help='metric to use to produce the labels', default='AUC_PR')
 
 	args = parser.parse_args()
-	create_tmp_dataset(
-		name=args.name,
-		save_dir=args.save_dir,
-		data_path=args.path,
-		metric_path=args.metric_path,
-		window_size=args.window_size, 
-		metric=args.metric,
-	)
+
+	if args.window_size == "all":
+		window_sizes = [16, 32, 64, 128, 256, 512, 768, 1024]
+
+		for size in window_sizes:
+			create_tmp_dataset(
+				name=args.name,
+				save_dir=args.save_dir,
+				data_path=args.path,
+				metric_path=args.metric_path,
+				window_size=size, 
+				metric=args.metric,
+			)
+	else:		
+		create_tmp_dataset(
+			name=args.name,
+			save_dir=args.save_dir,
+			data_path=args.path,
+			metric_path=args.metric_path,
+			window_size=int(args.window_size), 
+			metric=args.metric,
+		)
 

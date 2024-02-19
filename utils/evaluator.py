@@ -39,6 +39,7 @@ class Evaluator:
 		data_path,
 		batch_size=64,
 		deep_model=True,
+		device='cuda'
 	):
 		"""Predict function for all the models
 
@@ -74,7 +75,7 @@ class Evaluator:
 
 			if deep_model:
 				tic = perf_counter()
-				preds = self.predict_timeseries(model, data, batch_size=batch_size, device='cuda')
+				preds = self.predict_timeseries(model, data, batch_size=batch_size, device=device)
 			else:
 				X_val, y_val = data.__getallsamples__().astype('float32'), data.__getalllabels__()
 				tic = perf_counter()

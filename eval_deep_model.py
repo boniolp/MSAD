@@ -61,9 +61,13 @@ def eval_deep_model(
 
 		# Load model
 		model = deep_models[model_name](**model_parameters)
-		model.load_state_dict(torch.load(model_path))
-		model.eval()
-		model.to('cuda')	
+		if torch.cuda.is_available():
+			model.load_state_dict(torch.load(model_path))
+			model.eval()
+			model.to('cuda')
+		else:
+			model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+			model.eval()
 
 	# Load the splits
 	if read_from_file is not None:
@@ -99,6 +103,7 @@ def eval_deep_model(
 		fnames=fnames,
 		data_path=data_path,
 		deep_model=True,
+		device='cuda' if torch.cuda.is_available() else 'cpu',
 	)
 	results = results.sort_index()
 	results.columns = [f"{classifier_name}_{x}" for x in results.columns.values]

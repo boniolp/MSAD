@@ -5,6 +5,7 @@
 data.zip
 /results/raw_predictions
 /results/runs
+/results/done_training
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

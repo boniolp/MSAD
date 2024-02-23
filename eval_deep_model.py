@@ -59,9 +59,7 @@ def eval_deep_model(
 		# Read models parameters
 		model_parameters = json_file(model_parameters_file)
 		
-		# Change input size
-		# print(model_parameters)
-		# exit()
+		# Change input size according to input
 		if 'original_length' in model_parameters:
 			model_parameters['original_length'] = window_size
 		if 'timeseries_size' in model_parameters:

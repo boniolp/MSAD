@@ -4,6 +4,7 @@
 /results/weights/unsupervised/
 data.zip
 /results/raw_predictions
+/results/runs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

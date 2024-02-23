@@ -55,7 +55,7 @@ def train_deep_model(
 		seed=seed,
 		read_from_file=read_from_file,
 	)
-	# For testing
+	# Uncomment for testing
 	# train_set, val_set, test_set = train_set[:50], val_set[:10], test_set[:10]
 
 	# Load the data
@@ -73,6 +73,12 @@ def train_deep_model(
 
 	# Read models parameters
 	model_parameters = json_file(model_parameters_file)
+	
+	# Change input size according to input
+	if 'original_length' in model_parameters:
+		model_parameters['original_length'] = window_size
+	if 'timeseries_size' in model_parameters:
+		model_parameters['timeseries_size'] = window_size
 	
 	# Create the model, load it on GPU and print it
 	model = deep_models[model_name.lower()](**model_parameters).to(device)

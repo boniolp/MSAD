@@ -44,7 +44,7 @@ def eval_deep_model(
 	"""
 	window_size = int(re.search(r'\d+', str(data_path)).group())
 	batch_size = 128
-
+	
 	assert(
 		(model is not None) or \
 		(model_path is not None and model_parameters_file is not None)
@@ -58,6 +58,15 @@ def eval_deep_model(
 	if model == None:
 		# Read models parameters
 		model_parameters = json_file(model_parameters_file)
+		
+		# Change input size
+		# print(model_parameters)
+		# exit()
+		if 'original_length' in model_parameters:
+			model_parameters['original_length'] = window_size
+		if 'timeseries_size' in model_parameters:
+			model_parameters['timeseries_size'] = window_size
+
 
 		# Load model
 		model = deep_models[model_name](**model_parameters)
@@ -113,6 +122,7 @@ def eval_deep_model(
 		model=model,
 		fnames=fnames,
 		data_path=data_path,
+		batch_size=batch_size,
 		deep_model=True,
 		device='cuda' if torch.cuda.is_available() else 'cpu',
 	)

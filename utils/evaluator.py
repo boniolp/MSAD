@@ -66,7 +66,7 @@ class Evaluator:
 
 		# Main loop
 		for fname in loop:
-			# Fetch data for this specific timeserie
+			# Fetch data for this specific timeseries
 			data = TimeseriesDataset(
 				data_path=data_path,
 				fnames=[fname],
@@ -98,7 +98,7 @@ class Evaluator:
 	def predict_timeseries(self, model, val_data, batch_size, device='cuda', k=1):
 		all_preds = []
 		
-		# Timeserie to batches
+		# Timeseries to batches
 		val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False)
 
 		for (inputs, labels) in val_loader:

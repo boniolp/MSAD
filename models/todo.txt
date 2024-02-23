@@ -1,7 +1,0 @@
-add models
-
-add folder weight
-add folder runs
-
-write a code snippet in the readme under usage to show how to load and run a model
-Lets use a toy time series from the benchmark that we will store on giuthub in the data/example folder

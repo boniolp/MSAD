@@ -22,13 +22,21 @@ from utils.evaluator import Evaluator, load_classifier
 from utils.config import *
 
 
-def eval_feature_based(data_path, model_name, model_path, path_save=None, fnames=None):
+def eval_feature_based(
+	data_path, 
+	model_name, 
+	model_path, 
+	path_save=None, 
+	fnames=None,
+	read_from_file=None,
+):
 	"""Predict some time series with the given rocket model
 
-	:param data_path: path to the data to predict
-	:param model_path: path to the model to load and use for predictions
-	:param read_from_file: file to read which time series to predict from a given path
-	:param data: data to call directly from another function with loaded data
+    :param data_path: Path to the data to predict.
+    :param model_path: Path to the model to load and use for predictions.
+    :param path_save: Path to save the evaluation results.
+    :param fnames: List of file names (time series) to evaluate.
+    :param read_from_file: File to read which time series to predict from a given path.
 	"""
 	window_size = int(re.search(r'\d+', str(data_path)).group())
 	classifier_name = f"{model_name}_{window_size}" if str(window_size) not in model_name else model_name

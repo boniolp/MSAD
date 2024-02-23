@@ -33,14 +33,19 @@ def eval_deep_model(
 	read_from_file=None,
 	model=None
 ):
-	"""Given a model and some data it predicts the time series given
+	"""Evaluate a deep learning model on time series data and predict the time series.
 
-	:param data_path:
-	:param model_name:
-	:param model_path:
-	:param model_parameters_file:
-	:param path_save:
-	:param fnames:
+    :param data_path: Path to the time series data.
+    :param model_name: Name of the model to be evaluated.
+    :param model_path: Path to the pretrained model weights.
+    :param model_parameters_file: Path to the JSON file containing model parameters.
+    :param path_save: Path to save the evaluation results.
+    :param fnames: List of file names (time series) to evaluate.
+    :param read_from_file: Path to the file containing split information.
+    :param model: Preloaded model instance.
+
+	Returns:
+    DataFrame: A DataFrame containing the predicted time series.
 	"""
 	window_size = int(re.search(r'\d+', str(data_path)).group())
 	batch_size = 128
@@ -136,6 +141,8 @@ def eval_deep_model(
 	if path_save is not None:
 		file_name = os.path.join(path_save, f"{classifier_name}_preds.csv")
 		results.to_csv(file_name)
+
+	return results
 
 
 if __name__ == "__main__":

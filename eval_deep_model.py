@@ -54,6 +54,10 @@ def eval_deep_model(
 		not (fnames is not None and read_from_file is not None)
 	), "You should provide either the fnames or the path to the specific splits, not both"
 
+
+	print(torch.__version__)
+	exit()
+
 	# Load the model only if not provided
 	if model == None:
 		# Read models parameters

@@ -69,8 +69,7 @@ def eval_deep_model(
 			model_parameters['original_length'] = window_size
 		if 'timeseries_size' in model_parameters:
 			model_parameters['timeseries_size'] = window_size
-
-
+		
 		# Load model
 		model = deep_models[model_name](**model_parameters)
 
@@ -99,7 +98,6 @@ def eval_deep_model(
 			read_from_file=read_from_file,
 		)
 		fnames = test_set if len(test_set) > 0 else val_set
-		# fnames = fnames[:100]
 	else:
 		# Read data (single csv file or directory with csvs)
 		if '.csv' == data_path[-len('.csv'):]:
@@ -118,9 +116,22 @@ def eval_deep_model(
 		else:
 			fnames = tmp_fnames
 
+	# Uncomment for testing
+	fnames = fnames[:10]
+
+	# Specify classifier name for saving results
+	if "sit_conv" in model_path:
+		model_name = "sit_conv"
+	elif "sit_linear" in model_path:
+		model_name = "sit_linear"
+	elif "sit_stem_relu" in model_path:
+		model_name = "sit_stem_relu"
+	elif "sit_stem" in model_path:
+		model_name = "sit_stem"
+	classifier_name = f"{model_name}_{window_size}"
+	
 	# Evaluate model
 	evaluator = Evaluator()
-	classifier_name = f"{model_name}_{window_size}"
 	results = evaluator.predict(
 		model=model,
 		fnames=fnames,

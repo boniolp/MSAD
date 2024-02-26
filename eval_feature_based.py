@@ -17,7 +17,7 @@ from time import perf_counter
 from collections import Counter
 import pandas as pd
 
-from utils.timeseries_dataset import read_files
+from utils.timeseries_dataset import read_files, create_splits
 from utils.evaluator import Evaluator, load_classifier
 from utils.config import *
 
@@ -49,6 +49,14 @@ def eval_feature_based(
 	# Read data (single csv file or directory with csvs)
 	data = pd.read_csv(data_path, index_col=0)
 	labels, data = data['label'], data.drop('label', axis=1)
+
+	# Load the splits
+	if read_from_file is not None:
+		_, val_set, test_set = create_splits(
+			data_path,
+			read_from_file=read_from_file,
+		)
+		fnames = test_set if len(test_set) > 0 else val_set
 
 	# if fnames is not defined then predict everything
 	if fnames is None:

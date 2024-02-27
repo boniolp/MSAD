@@ -3,7 +3,7 @@
 # @author : Emmanouil Sylligardos
 # @when : Winter Semester 2022/2023
 # @where : LIPADE internship Paris
-# @title : Ensemble model anomaly detection
+# @title : MSAD (Model Selection Anomaly Detection)
 # @component: root
 # @file : merge_scores
 #

@@ -50,7 +50,6 @@ class ConvNet(nn.Module):
 		self.layers = nn.Sequential(*self.layers)
 				
 		self.GAP = nn.AvgPool1d(original_length)
-		print(original_length)
 		
 		self.fc1 = nn.Sequential(
 			nn.Linear(dims[-1], num_classes)

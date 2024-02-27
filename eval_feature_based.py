@@ -57,6 +57,7 @@ def eval_feature_based(
 			read_from_file=read_from_file,
 		)
 		fnames = test_set if len(test_set) > 0 else val_set
+		fnames = [x[:-len(".csv")] for x in fnames]
 
 	# if fnames is not defined then predict everything
 	if fnames is None:
@@ -102,6 +103,7 @@ if __name__ == "__main__":
 	parser.add_argument('-m', '--model', type=str, help='model to run', required=True)
 	parser.add_argument('-mp', '--model_path', type=str, help='path to the trained model', required=True)
 	parser.add_argument('-ps', '--path_save', type=str, help='path to save the results', default="results/raw_predictions")
+	parser.add_argument('-f', '--file', type=str, help='path to file that contains a specific split', default=None)
 
 	args = parser.parse_args()
 	eval_feature_based(
@@ -109,4 +111,6 @@ if __name__ == "__main__":
 		model_name=args.model,
 		model_path=args.model_path,
 		path_save=args.path_save,
+		read_from_file=args.file,
+
 	)

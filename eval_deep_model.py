@@ -117,7 +117,7 @@ def eval_deep_model(
 			fnames = tmp_fnames
 
 	# Uncomment for testing
-	fnames = fnames[:10]
+	# fnames = fnames[:10]
 
 	# Specify classifier name for saving results
 	if "sit_conv" in model_path:

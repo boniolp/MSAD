@@ -10,57 +10,57 @@
 ########################################################################
 
 from utils.metrics_loader import MetricsLoader
+from utils.config import TSB_metrics_path, TSB_data_path, detector_names, TSB_acc_tables_path
 
 import os
-from utils.config import *
 import pandas as pd
 import argparse
 import numpy as np
+from natsort import natsorted
 
-from natsort import natsorted, ns
 
-
-def main(path, metric):
-	df = None
-	metricsloader = MetricsLoader(TSB_new_metrics_path)
-	if metric not in metricsloader.get_names():
+def merge_scores(path, metric, save_path):
+	# Load MetricsLoader object
+	metricsloader = MetricsLoader(TSB_metrics_path)
+	
+	# Check if given metric exists
+	if metric.upper() not in metricsloader.get_names():
 		raise ValueError(f"Not recognizable metric {metric}. Please use one of {metricsloader.get_names()}")
 
-	# Read acc tables file and fix indexes to use later (if-else for VUS trick ;)
-	acc_tables_files = [x for x in os.listdir(TSB_metrics_path) if metric in x]
-	if len(acc_tables_files) != 1:
-		acc_tables = pd.read_csv(os.path.join(TSB_metrics_path, 'mergedTable_AUC_PR.csv'))
-		acc_tables.loc[:, detector_names] = np.NaN
-	elif len(acc_tables_files) == 1:
-		acc_tables = pd.read_csv(os.path.join(TSB_metrics_path, acc_tables_files[0]))
-	else:
-		raise ValueError(f'This file {acc_tables_files} should be unique please check it')
+	# Read accuracy table, fix indexing, remove detectors scores
+	acc_tables_path = os.path.join(TSB_acc_tables_path, f"mergedTable_AUC_PR.csv")
+	acc_tables = pd.read_csv(acc_tables_path, index_col=['dataset', 'filename'])
+	acc_tables = acc_tables.drop(columns=detector_names)
 
-	acc_tables_filenames = acc_tables['filename']
-	acc_tables_filenames = [x.replace('.txt', '.out') for x in acc_tables_filenames]
-	acc_tables['filename'] = acc_tables_filenames
-	acc_tables = acc_tables.set_index(keys=['dataset', 'filename'])
-
-	# Read classifiers scores and fix indexes
-	dir_path = os.path.join(path, metric)
-	scores_files = [x for x in os.listdir(dir_path) if '.csv' in x]
+	# Read detectors and oracles scores
+	metric_scores = metricsloader.read(metric.upper())
+	
+	# Read classifiers predictions, and add scores
+	df = None
+	scores_files = [x for x in os.listdir(path) if '.csv' in x]
 	for file in scores_files:
-		file_path = os.path.join(dir_path, file)
-		tmp = pd.read_csv(file_path, index_col=0)
+		file_path = os.path.join(path, file)
+		current_classifier = pd.read_csv(file_path, index_col=0)
+		col_name = [x for x in current_classifier.columns if "class" in x][0]
+		
+		values = np.diag(metric_scores.loc[current_classifier.index, current_classifier.iloc[:, 0]])
+		curr_df = pd.DataFrame(values, index=current_classifier.index, columns=[col_name.replace("_class", "")])
+		curr_df = pd.merge(current_classifier[col_name], curr_df, left_index=True, right_index=True)
 		
 		if df is None:
-			df = tmp
+			df = curr_df
 		else:
-			df = pd.merge(df, tmp, left_index=True, right_index=True)
+			df = pd.merge(df, curr_df, left_index=True, right_index=True)
 	df = df.reindex(natsorted(df.columns, key=lambda y: y.lower()), axis=1)
 
-	# Add Genie and Morty
-	genie = pd.read_csv(os.path.join(TSB_new_metrics_path, 'GENIE', f'{metric}.csv'), index_col=0)
-	morty = pd.read_csv(os.path.join(TSB_new_metrics_path, 'MORTY', f'{metric}.csv'), index_col=0)
-	genie_indexes = [x.replace(TSB_data_path+'/', '') for x in genie.index.tolist()]
-	genie.index = genie_indexes
-	oracles = pd.merge(genie, morty, left_index=True, right_index=True)
-	df = pd.merge(df, oracles, left_index=True, right_index=True)
+	# Add Oracle (TRUE_ORACLE-100) and Averaging Ensemble
+	df = pd.merge(df, metric_scores[["TRUE_ORACLE-100", "AVG_ENS"] + detector_names], left_index=True, right_index=True)
+	df.rename(columns={'TRUE_ORACLE-100': 'Oracle', 'AVG_ENS': 'Avg Ens'}, inplace=True)
+	
+	# Add true labels from AUC_PR metrics
+	auc_pr_detectors_scores = metricsloader.read('AUC_PR')[detector_names]
+	labels = auc_pr_detectors_scores.idxmax(axis=1).to_frame(name='label')
+	df = pd.merge(labels, df, left_index=True, right_index=True)
 	
 	# Change the indexes to dataset, filename
 	old_indexes = df.index.tolist()
@@ -70,44 +70,14 @@ def main(path, metric):
 	df = df.set_index(keys=['dataset', 'filename'])
 
 	# Merge the two dataframes now that they have common indexes
-	print('Indexes not found in acc_tables file:')
-	acc_tables_indexes = acc_tables.index
-	df_indexes = df.index
-	count = 0
-	for df_index in df_indexes:
-		if df_index not in acc_tables_indexes:
-			print(count, df_index)
-			count += 1	
 	final_df = df.join(acc_tables)
-
-	# Add the true labels into the final dataframe (labels come from AUC_PR only!)
-	metrics_data = metricsloader.read('AUC_PR')
-	metrics_data = metrics_data[detector_names]
-	metrics_data = pd.merge(metrics_data, filenames_df, left_index=True, right_index=True)
-	metrics_data = metrics_data.set_index(keys=['dataset', 'filename'])
-	labels = metrics_data.idxmax(axis=1).to_frame(name='label')
-	final_df = pd.merge(labels, final_df, left_index=True, right_index=True)
-
-	# Find all sequences with missing detectors scores and fill them
-	nan_values = final_df[final_df.isna().any(axis=1)]
-	if 'VUS' in metric:
-		nan_values_indexes = [os.path.join('/'.join(list(x))) for x in nan_values.index.tolist()]
-	else:
-		nan_values_indexes = [os.path.join('data', 'TSB', 'data', '/'.join(list(x))) for x in nan_values.index.tolist()]
-	for detector in detector_names:
-		detector_file_path = os.path.join(TSB_new_metrics_path, detector, f'{metric}.csv')
-		detector_score = pd.read_csv(detector_file_path, index_col=0)
-		missing_values = detector_score.loc[nan_values_indexes].to_numpy().reshape(-1)		
-		
-		counter = 0
-		for index, row in nan_values.iterrows():
-			final_df.at[index, detector] = missing_values[counter]
-			counter += 1
+	indexes_not_found = final_df[final_df.iloc[:, -len(acc_tables.columns):].isna().any(axis=1)].index.tolist()
+	print('Indexes not found in acc_tables file:')
+	[print(i, x) for i, x in enumerate(indexes_not_found)]
 
 	# Save the final dataframe
+	final_df.to_csv(os.path.join(save_path, f'all_acuracy_{metric.upper()}.csv'), index=True)
 	print(final_df)
-	final_df.to_csv(os.path.join(path, f'merged_scores_{metric}.csv'))
-
 
 
 if __name__ == "__main__":
@@ -117,9 +87,11 @@ if __name__ == "__main__":
 	)
 	parser.add_argument('-p', '--path', help='path of the files to merge')
 	parser.add_argument('-m', '--metric', help='metric to use')
-
+	parser.add_argument('-s', '--save_path', help='where to save the result')
 	args = parser.parse_args()
-	main(
+	
+	merge_scores(
 		path=args.path, 
-		metric=args.metric
+		metric=args.metric,
+		save_path=args.save_path,
 	)

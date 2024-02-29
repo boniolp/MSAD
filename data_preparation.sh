@@ -24,4 +24,4 @@ python3 generate_features.py --path=data/TSB_512/
 python3 generate_features.py --path=data/TSB_768/
 python3 generate_features.py --path=data/TSB_1024/
 
-python3.6 generate_features.py --path=data/TSB_16/ ; python3.6 generate_features.py --path=data/TSB_32/ ; python3.6 generate_features.py --path=data/TSB_64/ ; python3.6 generate_features.py --path=data/TSB_128/ ; python3.6 generate_features.py --path=data/TSB_256/
+python3 generate_features.py --path=data/TSB_16/ ; python3.6 generate_features.py --path=data/TSB_32/ ; python3.6 generate_features.py --path=data/TSB_64/ ; python3.6 generate_features.py --path=data/TSB_128/ ; python3.6 generate_features.py --path=data/TSB_256/

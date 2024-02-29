@@ -76,7 +76,7 @@ def merge_scores(path, metric, save_path):
 	[print(i, x) for i, x in enumerate(indexes_not_found)]
 
 	# Save the final dataframe
-	final_df.to_csv(os.path.join(save_path, f'all_acuracy_{metric.upper()}.csv'), index=True)
+	final_df.to_csv(os.path.join(save_path, f'all_accuracy_{metric.upper()}.csv'), index=True)
 	print(final_df)
 
 

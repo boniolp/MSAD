@@ -1,4 +1,4 @@
-# Reproducability Guide
+# Reproducibility Guide
 
 ## Prepare the dataset
 

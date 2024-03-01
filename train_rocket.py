@@ -71,9 +71,9 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	print(f"After... size of train dataset: {len(y_train)}, size of validation dataset: {len(y_val)}")
 	
 	# Create the feature extractor, the scaler, and the classifier
-	minirocket = MiniRocket(num_kernels=10000, n_jobs=24)
+	minirocket = MiniRocket(num_kernels=10000, n_jobs=-1)
 	scaler = StandardScaler(with_mean=False, copy=False)
-	clf = SGDClassifier(loss='log_loss', n_jobs=24)
+	clf = SGDClassifier(loss='log_loss', n_jobs=-1)
 
 	tic = perf_counter()
 	X_train = minirocket.fit_transform(X_train).to_numpy()

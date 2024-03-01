@@ -1,6 +1,7 @@
 # Project specific
 /data/TSB*/
 /results/weights/*
+/results/weights.zip
 !/results/weights/readme.txt
 data.zip
 /results/raw_predictions

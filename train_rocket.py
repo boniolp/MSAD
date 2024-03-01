@@ -57,6 +57,18 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	# Split data from labels
 	X_train, y_train = training_data.__getallsamples__().astype('float32'), training_data.__getalllabels__()
 	X_val, y_val = val_data.__getallsamples__().astype('float32'), val_data.__getalllabels__()
+
+	# For rocket 16 use only a random subset of the dataset to train (otherwise its untrainable)
+	print(f"Size of train dataset: {len(y_train)}, size of validation dataset: {len(y_val)}")
+	if len(y_train) > 1e6:
+		rand_ind = np.random.randint(low=0, high=len(y_train), size=int(len(y_train)/10))
+		X_train = X_train[rand_ind]
+		y_train = y_train[rand_ind]
+
+		rand_ind = np.random.randint(low=0, high=len(y_val), size=int(len(y_val)/10))
+		X_val = X_val[rand_ind]
+		y_val = y_val[rand_ind]
+	print(f"After... size of train dataset: {len(y_train)}, size of validation dataset: {len(y_val)}")
 	
 	# Create the feature extractor, the scaler, and the classifier
 	minirocket = MiniRocket(num_kernels=10000, n_jobs=24)

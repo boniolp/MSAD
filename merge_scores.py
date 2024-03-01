@@ -27,10 +27,12 @@ def merge_scores(path, metric, save_path):
 	if metric.upper() not in metricsloader.get_names():
 		raise ValueError(f"Not recognizable metric {metric}. Please use one of {metricsloader.get_names()}")
 
-	# Read accuracy table, fix indexing, remove detectors scores
-	acc_tables_path = os.path.join(TSB_acc_tables_path, f"mergedTable_AUC_PR.csv")
-	acc_tables = pd.read_csv(acc_tables_path, index_col=['dataset', 'filename'])
-	acc_tables = acc_tables.drop(columns=detector_names)
+	# Read accuracy table, fix filenames & indexing, remove detectors scores
+	acc_tables_path = os.path.join(TSB_acc_tables_path, "mergedTable_AUC_PR.csv")
+	acc_tables = pd.read_csv(acc_tables_path)
+	acc_tables['filename'] = acc_tables['filename'].apply(lambda x: x.replace('.txt', '.out') if x.endswith('.txt') else x)
+	acc_tables.set_index(['dataset', 'filename'], inplace=True)
+	acc_tables.drop(columns=detector_names, inplace=True)
 
 	# Read detectors and oracles scores
 	metric_scores = metricsloader.read(metric.upper())

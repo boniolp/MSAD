@@ -59,9 +59,9 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	X_val, y_val = val_data.__getallsamples__().astype('float32'), val_data.__getalllabels__()
 	
 	# Create the feature extractor, the scaler, and the classifier
-	minirocket = MiniRocket(num_kernels=10000, n_jobs=16)
+	minirocket = MiniRocket(num_kernels=10000, n_jobs=24)
 	scaler = StandardScaler(with_mean=False, copy=False)
-	clf = SGDClassifier(loss='log_loss', n_jobs=16)
+	clf = SGDClassifier(loss='log_loss', n_jobs=24)
 
 	tic = perf_counter()
 	X_train = minirocket.fit_transform(X_train).to_numpy()

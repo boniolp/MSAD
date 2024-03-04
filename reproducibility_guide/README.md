@@ -10,7 +10,8 @@ To create the additional data on your own, without downloading them from our dri
 bash data_preparation.sh
 ```
 
-To do this you will have to download the TSB.zip folder from our drive. The data.zip folder contains everything so you can skip this step.
+To do this you will have to download the TSB.zip folder from our drive. The data.zip folder contains everything so you can skip this step. Here is the link for the preprocessed/ready-to-go dataset:
+https://drive.google.com/file/d/1KBFzKE3Z-tUe_3KdI6gxnfjbMc0ampr6/view?usp=sharing
 
 ## Train all models and evaluate them on the validation data
 
@@ -40,7 +41,7 @@ This command will use our trained models (or yours if you did the previous step)
 
 ## Combine the results and run the jupyter notebook
 
-Once you have the results from all the models in the results/raw_predictions directory, run the following command to combine them into a single file:
+Once you have the results from _all_ the models in the results/raw_predictions directory, run the following command to combine them into a single file:
 
 ```
 python3 merge_scores.py --path=results/raw_predictions/ --metric=auc_pr --save_path=results/

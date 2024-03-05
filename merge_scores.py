@@ -78,8 +78,58 @@ def merge_scores(path, metric, save_path):
 	[print(i, x) for i, x in enumerate(indexes_not_found)]
 
 	# Save the final dataframe
-	final_df.to_csv(os.path.join(save_path, f'all_accuracy_{metric.upper()}.csv'), index=True)
+	final_df.to_csv(os.path.join(save_path, f'current_accuracy_{metric.upper()}.csv'), index=True)
 	print(final_df)
+
+
+def merge_inference_times(path, save_path):
+	detectors_inf_time_path = 'results/execution_time/detectors_inference_time.csv'
+
+	# Read raw predictions of each model selector and fix indexing
+	selector_predictions = {}
+	for file_name in os.listdir(path):
+		if file_name.endswith('.csv'):
+			selector_name = file_name.replace("_preds.csv", "")
+			curr_df = pd.read_csv(os.path.join(path, file_name), index_col=0)
+			old_indexes = curr_df.index.tolist()
+			old_indexes_split = [tuple(x.split('/')) for x in old_indexes]
+			filenames_df = pd.DataFrame(old_indexes_split, index=old_indexes, columns=['dataset', 'filename'])
+			curr_df = pd.merge(curr_df, filenames_df, left_index=True, right_index=True)
+			curr_df = curr_df.set_index(keys=['dataset', 'filename'])
+			selector_predictions[selector_name] = curr_df
+
+	# Read detectors inference time
+	try:
+		detectors_inf = pd.read_csv(detectors_inf_time_path, index_col=["dataset", "filename"])
+	except Exception as e :
+		print("Oops could read detectors' inference times file. Please specify the path correctly in code")
+		print(e)
+		return
+
+	# For each time series read the predicted detector and add the inference time of that detector to its prediction time
+	final_df = None
+	for selector_name, df in selector_predictions.items():
+		df = df[df.index.isin(detectors_inf.index)]
+
+		sum = np.diag(detectors_inf.loc[df.index, df[f"{selector_name}_class"]]) + df[f"{selector_name}_inf"]
+		sum.rename(f"{selector_name}", inplace=True)
+
+		sum_df = pd.merge(df, sum, left_index=True, right_index=True)
+		sum_df.rename(columns={f"{selector_name}_inf": f"{selector_name}_pred"}, inplace=True)
+		
+		if final_df is None:
+			final_df = sum_df
+		else:
+			final_df = pd.merge(final_df, sum_df, left_index=True, right_index=True)
+
+
+	# Merge with detectors inference times
+	final_df = pd.merge(detectors_inf, final_df, left_index=True, right_index=True)
+	
+	# Save the file with name model_selectors_inference_time.csv in the results/execution_time dir
+	final_df.to_csv(os.path.join(save_path, f'current_inference_time.csv'), index=True)
+	print(final_df)
+
 
 
 if __name__ == "__main__":
@@ -90,10 +140,21 @@ if __name__ == "__main__":
 	parser.add_argument('-p', '--path', help='path of the files to merge')
 	parser.add_argument('-m', '--metric', help='metric to use')
 	parser.add_argument('-s', '--save_path', help='where to save the result')
+	parser.add_argument('-time', '--time-true', action="store_true", help='whether to produce time results')
+
+
 	args = parser.parse_args()
 	
-	merge_scores(
-		path=args.path, 
-		metric=args.metric,
-		save_path=args.save_path,
-	)
+	
+	if not args.time_true:
+		merge_scores(
+			path=args.path, 
+			metric=args.metric,
+			save_path=args.save_path,
+		)
+	else:
+		merge_inference_times(
+			path=args.path, 
+			save_path=args.save_path,
+		)
+

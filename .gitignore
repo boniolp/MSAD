@@ -8,6 +8,9 @@ data.zip
 /results/runs
 /results/done_training
 /results/accuracy/*
+current_accuracy_AUC_PR.csv
+current_accuracy_VUS_PR.csv
+current_inference_time.csv
 
 
 # Byte-compiled / optimized / DLL files

@@ -81,14 +81,8 @@ In the 'all_training_time.csv' there are the training times for every model sele
 
 In the 'detectors_inference_time.csv' file you will find the inference time for all detectors and for every time series in the validation set + the inderence time of Averaging Ensemble (Avg Ens.) which is the sum of the inference time of all detectors in a given time series.
 
-```
 
-```
-
-
-NOTE: For the time being the notebook requires the results from all models to run otherwise it crashes. This is incovenient as you may only want to see some of the results. We are planning to change the notebook so that it can run with only a part of the results.
-
-NOTE: This guide does not yet contain information on how to reproduce the inference results and the unsupervised experiments. We will add those next week.
+NOTE: This guide does not yet contain information on how to reproduce the unsupervised experiments. We will add those next week.
 
 For any questions contact me on my email:
 emmanouil.sylligardos@ens.fr

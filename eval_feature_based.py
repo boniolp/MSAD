@@ -16,6 +16,7 @@ from tqdm import tqdm
 from time import perf_counter
 from collections import Counter
 import pandas as pd
+from datetime import datetime
 
 from utils.timeseries_dataset import read_files, create_splits
 from utils.evaluator import Evaluator, load_classifier
@@ -40,6 +41,8 @@ def eval_feature_based(
 	"""
 	window_size = int(re.search(r'\d+', str(data_path)).group())
 	classifier_name = f"{model_name}_{window_size}" if str(window_size) not in model_name else model_name
+	if read_from_file is not None and "unsupervised" in read_from_file:
+		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
 	all_preds = []
 	inf_time = []
 

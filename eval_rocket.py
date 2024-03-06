@@ -12,6 +12,7 @@
 import argparse
 import re
 import os
+from datetime import datetime
 
 from utils.timeseries_dataset import read_files, create_splits
 from utils.evaluator import Evaluator, load_classifier
@@ -31,7 +32,12 @@ def eval_rocket(data_path, model_path, path_save=None, fnames=None, read_from_fi
 	"""
 	window_size = int(re.search(r'\d+', str(data_path)).group())
 	classifier_name = f"rocket_{window_size}"
-
+	if read_from_file is not None and "unsupervised" in read_from_file:
+		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+	elif "testsize_" in model_path:
+		extra = model_path.split('/')[-2].replace(classifier_name, "")
+		classifier_name += extra
+		
 	assert(
 		not (fnames is not None and read_from_file is not None)
 	), "You should provide either the fnames or the path to the specific splits, not both"

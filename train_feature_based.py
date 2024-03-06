@@ -125,6 +125,8 @@ def train_feature_based(data_path, classifier_name, split_per=0.7, seed=None, re
 
 	# Save training stats
 	classifier_name = f"{clf_name}_{window_size}"
+	if read_from_file is not None and "unsupervised" in read_from_file:
+		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
 	timestamp = datetime.now().strftime('%d%m%Y_%H%M%S')
 	df = pd.DataFrame.from_dict(training_stats, columns=["training_stats"], orient="index")
 	df.to_csv(os.path.join(save_done_training, f"{classifier_name}_{timestamp}.csv"))

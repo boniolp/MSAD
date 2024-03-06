@@ -82,12 +82,14 @@ def train_deep_model(
 	
 	# Create the model, load it on GPU and print it
 	model = deep_models[model_name.lower()](**model_parameters).to(device)
-	model_fullname = f"{model_parameters_file.split('/')[-1].replace('.json', '')}_{window_size}"
+	classifier_name = f"{model_parameters_file.split('/')[-1].replace('.json', '')}_{window_size}"
+	if read_from_file is not None and "unsupervised" in read_from_file:
+		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
 	
 	# Create the executioner object
 	model_execute = ModelExecutioner(
 		model=model,
-		model_name=model_fullname,
+		model_name=classifier_name,
 		device=device,
 		criterion=nn.CrossEntropyLoss(weight=class_weights).to(device),
 		runs_dir=save_runs,
@@ -109,10 +111,12 @@ def train_deep_model(
 	# Save training stats
 	timestamp = datetime.now().strftime('%d%m%Y_%H%M%S')
 	df = pd.DataFrame.from_dict(results, columns=["training_stats"], orient="index")
-	df.to_csv(os.path.join(save_done_training, f"{model_fullname}_{timestamp}.csv"))
+	df.to_csv(os.path.join(save_done_training, f"{classifier_name}_{timestamp}.csv"))
 
 	# Evaluate on test set or val set
 	if eval_model:
+		if read_from_file is not None and "unsupervised" in read_from_file:
+			os.path.join(path_save_results, "unsupervised")
 		eval_set = test_set if len(test_set) > 0 else val_set
 		eval_deep_model(
 			data_path=data_path, 

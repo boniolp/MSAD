@@ -38,6 +38,8 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	# Set up
 	window_size = int(re.search(r'\d+', data_path).group())
 	classifier_name = f"rocket_{window_size}"
+	if read_from_file is not None and "unsupervised" in read_from_file:
+		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
 	training_stats = {}
 
 	# Load the splits
@@ -47,6 +49,8 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 		seed=seed,
 		read_from_file=read_from_file,
 	)
+
+	# Uncomment for testing
 	# train_set, val_set, test_set = train_set[:10], val_set[:10], test_set[:5]
 
 	# Load the data
@@ -71,9 +75,9 @@ def run_rocket(data_path, split_per=0.7, seed=None, read_from_file=None, eval_mo
 	print(f"After... size of train dataset: {len(y_train)}, size of validation dataset: {len(y_val)}")
 	
 	# Create the feature extractor, the scaler, and the classifier
-	minirocket = MiniRocket(num_kernels=10000, n_jobs=-1)
+	minirocket = MiniRocket(num_kernels=10000, n_jobs=24)
 	scaler = StandardScaler(with_mean=False, copy=False)
-	clf = SGDClassifier(loss='log_loss', n_jobs=-1)
+	clf = SGDClassifier(loss='log_loss', n_jobs=24)
 
 	tic = perf_counter()
 	X_train = minirocket.fit_transform(X_train).to_numpy()

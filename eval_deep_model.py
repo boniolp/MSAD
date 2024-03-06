@@ -129,6 +129,13 @@ def eval_deep_model(
 	elif "sit_stem" in model_path:
 		model_name = "sit_stem"
 	classifier_name = f"{model_name}_{window_size}"
+	if read_from_file is not None and "unsupervised" in read_from_file:
+		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
+	elif "unsupervised" in path_save:
+		print(path_save)
+		exit()
+		extra = model_path.split('/')[-2].replace(classifier_name, "")
+		classifier_name += extra
 	
 	# Evaluate model
 	evaluator = Evaluator()

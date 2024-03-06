@@ -4,7 +4,9 @@
 /results/weights.zip
 !/results/weights/readme.txt
 data.zip
-/results/raw_predictions
+/results/raw_predictions/*.csv
+/results/raw_predictions/supervised/*.csv
+/results/raw_predictions/unsupervised/*.csv
 /results/runs
 /results/done_training
 /results/accuracy/*

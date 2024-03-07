@@ -386,7 +386,7 @@ def json_file(x):
 
 	try:
 		with open(x) as f:
-   			variables = json.load(f)
+			variables = json.load(f)
 	except Exception as e:
 		raise argparse.ArgumentTypeError("{} is not a json file".format(x))
 

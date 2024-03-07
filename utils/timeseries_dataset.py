@@ -81,6 +81,9 @@ def create_splits(data_path, split_per=0.7, seed=None, read_from_file=None):
 		datasets = [x for x in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, x))]
 		datasets.sort()
 
+	if not os.path.isdir(dir_path):
+		dir_path = '/'.join(dir_path.split('/')[:-1])
+	
 	# Random split of train & val sets
 	for dataset in datasets:
 		# Read file names

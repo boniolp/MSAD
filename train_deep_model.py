@@ -56,7 +56,8 @@ def train_deep_model(
 		read_from_file=read_from_file,
 	)
 	# Uncomment for testing
-	# train_set, val_set, test_set = train_set[:50], val_set[:10], test_set[:10]
+	if epochs == 1:
+		train_set, val_set, test_set = train_set[:50], val_set[:10], test_set[:10]
 
 	# Load the data
 	print('----------------------------------------------------------------')

@@ -176,7 +176,7 @@ class ModelExecutioner:
 		self.n_epochs = n_epochs
 		self.verbose = verbose
 		best_val_loss = np.Inf
-		best_val_acc = 0
+		best_val_acc = -1
 		best_model = None
 
 		# Set up early stop

@@ -120,14 +120,15 @@ def eval_deep_model(
 	# fnames = fnames[:10]
 
 	# Specify classifier name for saving results
-	if "sit_conv" in model_path:
-		model_name = "sit_conv"
-	elif "sit_linear" in model_path:
-		model_name = "sit_linear"
-	elif "sit_stem_relu" in model_path:
-		model_name = "sit_stem_relu"
-	elif "sit_stem" in model_path:
-		model_name = "sit_stem"
+	if model_path is not None:
+		if "sit_conv" in model_path:
+			model_name = "sit_conv"
+		elif "sit_linear" in model_path:
+			model_name = "sit_linear"
+		elif "sit_stem_relu" in model_path:
+			model_name = "sit_stem_relu"
+		elif "sit_stem" in model_path:
+			model_name = "sit_stem"
 	classifier_name = f"{model_name}_{window_size}"
 	if read_from_file is not None and "unsupervised" in read_from_file:
 		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"

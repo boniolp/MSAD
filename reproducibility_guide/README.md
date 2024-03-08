@@ -82,7 +82,20 @@ In the 'all_training_time.csv' there are the training times for every model sele
 In the 'detectors_inference_time.csv' file you will find the inference time for all detectors and for every time series in the validation set + the inderence time of Averaging Ensemble (Avg Ens.) which is the sum of the inference time of all detectors in a given time series.
 
 
-NOTE: This guide does not yet contain information on how to reproduce the unsupervised experiments. We will add those next week.
+## Unsupervised Experiments
+
+For the unsupervised experiments we are only using 5 models, these are our best models (at the time of the publication) per family of models. Namely the models are, kNN-1024, Rocket-128, ConvNet-128, ResNet-1024, SiT-512. We are training the model 16 different times on 16 different subsets of the TSB benchmark, each time leaving one of the 16 datasets out of the training process for testing. Then we are evaluating the models on the one dataset that was left out.
+
+### Train the models for the unsupervised experiments
+
+To train the models we provide 3 .sh files. If you don't want to train the models, since it is very time consuming and requires lots of processing power, you can use our trained models that you will find in the weights directory on the cloud (link provided in the main readme of the repository). However, the unsupervised deep learning models are not provided, so you can either evaluate our results on 2 out of the 5 models, or train them yourself using one of the following commands. The commands to run the .sh files and train the unsupervised models:
+
+```
+bash train_unsupervised_deep_models.sh
+bash train_unsupervised_feature_based.sh
+bash train_unsupervised_rockets.sh
+```
+
 
 For any questions contact me on my email:
 emmanouil.sylligardos@ens.fr

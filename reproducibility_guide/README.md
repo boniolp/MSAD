@@ -118,7 +118,7 @@ python3 merge_unsupervised_scores.py --path=results/raw_predictions/unsupervised
 
 This command will merge the results of all models, per split, so after running this command you should have a file per split of the dataset, and not a file per split per model. The combined results will be saved in the 'results/unsupervised_results/AUC_PR/' directory under the names 'current_testsize_1_split_#.csv'. This is to differentiate from our original results from the publication. You can modify the reading path on the notebook to either display the plots from your reproduced results and our original results.
 
-For any questions contact me on my email:
+For any questions you can contact me by email at:
 emmanouil.sylligardos@ens.fr
 
-Thank you for your time and I would be happy to answer any of your questions regarding reproducing our experiments.
+Thank you for your time to reproduce our results and I would be happy to answer any of your questions.

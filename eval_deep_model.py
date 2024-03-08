@@ -133,8 +133,6 @@ def eval_deep_model(
 	if read_from_file is not None and "unsupervised" in read_from_file:
 		classifier_name += f"_{read_from_file.split('/')[-1].replace('unsupervised_', '')[:-len('.csv')]}"
 	elif "unsupervised" in path_save:
-		print(path_save)
-		exit()
 		extra = model_path.split('/')[-2].replace(classifier_name, "")
 		classifier_name += extra
 	
@@ -153,8 +151,9 @@ def eval_deep_model(
 	
 	# Print results
 	print(results)
-	counter = Counter(results[f"{model_name}_{window_size}_class"])
-	print(dict(counter))
+	counter = dict(Counter(results[f"{classifier_name}_class"]))
+	counter = {k: v for k, v in sorted(counter.items(), key=lambda item: item[1], reverse=True)}
+	print(counter)
 	
 	# Save the results
 	if path_save is not None:

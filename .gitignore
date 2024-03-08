@@ -13,6 +13,8 @@ data.zip
 current_accuracy_AUC_PR.csv
 current_accuracy_VUS_PR.csv
 current_inference_time.csv
+/results/unsupervised_results/AUC_PR/current_*.csv
+/results/unsupervised_results/VUS_PR/current_*.csv
 
 
 # Byte-compiled / optimized / DLL files

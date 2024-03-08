@@ -63,13 +63,13 @@ cd MSAD/
 - [Download datasets](https://drive.google.com/file/d/1PQKwu5lZTnTmsmms1ipko9KF712Oc5DE/view?usp=sharing)
 
   - Move the downloaded file `TSB.zip` into the `MSAD/data/` directory and unzip it.
-  
+
 - [Download datasets + preprocesed data](https://drive.google.com/file/d/1KBFzKE3Z-tUe_3KdI6gxnfjbMc0ampr6/view?usp=sharing)
-  
+
   - Unzip the downloaded `data.zip` file and move its contents into the `MSAD/data/` directory. With this files you can skip the steps of generating the Oracles, and creating the proccesed datasets (windowed and features).
 
 - [Download weights](https://drive.google.com/file/d/1eLbApzSF7Th6hcKcwCX98XzRMDsp8aEN/view?usp=sharing)
-  
+
   - Unzip the downloaded `weights.zip` file and move its contents (`supervised/` and `unsupervised/`) into the `MSAD/results/weights/` directory.
 
 **Step 3:** Create and activate a `conda` environment named `MSAD`.

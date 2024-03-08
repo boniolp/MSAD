@@ -95,7 +95,28 @@ bash train_unsupervised_deep_models.sh
 bash train_unsupervised_feature_based.sh
 bash train_unsupervised_rockets.sh
 ```
+These commands will train the models on all different splits/subsets of the dataset and will save the trained models. Rocket and kNN (a.k.a. feature based) will be saved in 'results/weights/unsupervised/' but deep models will be saved in 'results/weights/'. Make sure to manually move the deep models into this directory 'results/weights/unsupervised/'.
 
+### Evaluating the trained models
+
+Whether you downloaded our trained models or you trained them youself you should now have the trained weights into this directory 'results/weights/unsupervised/'. You can now run the .sh files to evaluate the models, that is to say to predict for each model the one dataset that was left out from the training process and has never been seen by the model. The commands to evaluate the models:
+
+```
+bash #todo
+bash eval_unsupervised_feature_based.sh
+bash eval_unsupervised_rockets.sh
+```
+These commands will save the predictions of the models for each split in the 'results/raw_predictions/unsupervised/' directory.
+
+### Combine the unsupervised results and visualize them
+
+If you weren't able to train the deep models, you are able to visualize part of the results by commenting and uncommenting certain parts of the notebook. First we have to merge our results though. To do this run the following command:
+
+```
+python3 merge_unsupervised_scores.py --path=results/raw_predictions/unsupervised/ --metric=auc_pr --save_path=results/unsupervised_results/AUC_PR/
+```
+
+This command will merge the results of all models, per split, so after running this command you should have a file per split of the dataset, and not a file per split per model. The combined results will be saved in the 'results/unsupervised_results/AUC_PR/' directory under the names 'current_testsize_1_split_#.csv'. This is to differentiate from our original results from the publication. You can modify the reading path on the notebook to either display the plots from your reproduced results and our original results.
 
 For any questions contact me on my email:
 emmanouil.sylligardos@ens.fr

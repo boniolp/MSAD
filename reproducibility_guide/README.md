@@ -15,7 +15,7 @@ https://drive.google.com/file/d/1KBFzKE3Z-tUe_3KdI6gxnfjbMc0ampr6/view?usp=shari
 
 ## Train all models and evaluate them on the validation data
 
-We have created multiple `.sh` files to reproduce the results. Some of them are for training the models, and some are for evaluating them. Training all the models requires a significant amount of computing power and time. Thus, you can find all the trained models in the `weights.zip` folder on our drive (link provided in the README files in the `results/weights` directory), which includes deep learning, feature-based, and rocket models (the last two were added recently).
+We have created multiple `.sh` files to reproduce the results. Some of them are for training the models, and some are for evaluating them. Training all the models requires a significant amount of computing power and time. Thus, you can find all the trained models in the `weights.zip` folder on our drive (link provided in the README file in the `results/weights` directory), which includes deep learning, feature-based, and rocket models (the last two were added recently).
 
 To train all the models again, run the following commands from the root directory:
 
@@ -61,6 +61,7 @@ Follow the comments in the notebook and run every cell to see the results.
 ### Inference Time
 
 In the `results/execution_time` directory, you will find all files related to execution time. Some specifications:
+
 - Inference time for the detectors is the time required for one detector (e.g., NORMA) to process one time series.
 - Inference time for a model selector is the time required to predict the best detector for a given time series + the inference time of that detector.
 - Training time is the time required to train all model selectors on each dataset.
@@ -90,7 +91,7 @@ For the unsupervised experiments, we are only using 5 models, which are our best
 
 ### Train the models for the unsupervised experiments
 
-To train the models, we provide three `.sh` files. If you don't want to train the models, since it is very time-consuming and requires a lot of processing power, you can use our trained models that you will find in the `weights` directory on the cloud (link provided in the main README of the repository). However, the unsupervised deep learning models are not provided, so you can either evaluate our results on 2 out of the 5 models or train them yourself using one of the following commands. The commands to run the `.sh` files and train the unsupervised models:
+To train the models, we provide three `.sh` files. If you don't want to train the models, since it is very time-consuming and requires a lot of processing power, you can use our trained models that you will find in the `weights` directory on the cloud (link provided in the main README of the repository). The commands to run the `.sh` files and train the unsupervised models:
 
 ```
 bash train_unsupervised_deep_models.sh
@@ -121,8 +122,6 @@ python3 merge_unsupervised_scores.py --path=results/raw_predictions/unsupervised
 ```
 
 This command will merge the results of all models, per split, so after running this command, you should have a file per split of the dataset, and not a file per split per model. The combined results will be saved in the `results/unsupervised_results/AUC_PR/` directory under the names `current_testsize_1_split_#.csv`. This is to differentiate to our original results from the publication. You can modify the reading path on the notebook to either display the plots from your reproduced results and our original results.
-
-Note: Although we provide most of our models trained so you can evaluate them directly without training them, we do not provide yet the unsupervised deep models trained. To evaluate those you have to train them, otherwise you can evaluate the unsupervised experiments with just the feature-based and rocket models which we do provide trained.
 
 For any questions, you can contact me by email at:
 emmanouil.sylligardos@ens.fr

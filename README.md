@@ -68,7 +68,7 @@ cd MSAD/
 
   - Unzip the downloaded `data.zip` file and move its contents into the `MSAD/data/` directory. With this files you can skip the steps of generating the Oracles, and creating the proccesed datasets (windowed and features).
 
-- [Download weights](https://drive.google.com/file/d/1eLbApzSF7Th6hcKcwCX98XzRMDsp8aEN/view?usp=sharing)
+- [Download weights](https://drive.google.com/file/d/1qMfSTPXVT2XkwHkwuRE26mo19FKXrf60/view?usp=sharing)
 
   - Unzip the downloaded `weights.zip` file and move its contents (`supervised/` and `unsupervised/`) into the `MSAD/results/weights/` directory.
 

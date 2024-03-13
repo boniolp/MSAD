@@ -1,5 +1,5 @@
 link to weights of the trained models:
-https://drive.google.com/file/d/1eLbApzSF7Th6hcKcwCX98XzRMDsp8aEN/view?usp=sharing
+https://drive.google.com/file/d/1qMfSTPXVT2XkwHkwuRE26mo19FKXrf60/view?usp=sharing
 
 1) download the file from the link
 2) unzip it

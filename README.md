@@ -39,8 +39,8 @@ If you use MSAD in your project or research, please cite the following paper:
 
 ## Contributors
 
-- **Emmanouil Sylligardos** (ICS-FORTH)
-- **Paul Boniol** (Université Paris Cité)
+- **Emmanouil Sylligardos** (ENS, Inria, DIENS, PSL, CNRS)
+- **Paul Boniol** (ENS, Inria, DIENS, PSL, CNRS)
 
 ## Installation
 

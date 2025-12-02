@@ -20,6 +20,30 @@ If you use MSAD in your project or research, please cite the following paper:
 
 - [VLDB, 2023](https://dl.acm.org/doi/abs/10.14778/3611479.3611536)
 
+## Extensions and Further Work
+
+### Journal Extension and MSADv2
+
+This repository has been **extended** in the following work, which introduces **weighted averaging techniques** and more advanced model selection methods for anomaly detection in time series:
+
+- [MSAD: A deep dive into model selection for time series anomaly detection](https://arxiv.org/pdf/2510.26643)  
+  *The VLDB Journal*, 2025
+  ```
+  @article{sylligardos2025msad,
+    title={MSAD: A deep dive into model selection for time series anomaly detection},
+    author={Sylligardos, Emmanouil and Paparrizos, John and Palpanas, Themis and Senellart, Pierre and Boniol, Paul},
+    journal={The VLDB Journal},
+    volume={34},
+    number={6},
+    pages={1--25},
+    year={2025},
+    publisher={Springer}
+  }
+  ```
+
+> **See the new repository:**  
+> [sylligardos/MSADv2](https://github.com/sylligardos/MSADv2)
+
 ### Reference
 
 > Sylligardos, Emmanouil, et al. "Choose Wisely: An Extensive Evaluation of Model Selection for Anomaly Detection in Time Series." Proceedings of the VLDB Endowment 16.11 (2023): 3418-3432.

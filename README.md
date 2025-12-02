@@ -44,7 +44,7 @@ This repository has been **extended** in the following work, which introduces **
 > **See the new repository:**  
 > [sylligardos/MSADv2](https://github.com/sylligardos/MSADv2)
 
-### Reference
+## Reference
 
 > Sylligardos, Emmanouil, et al. "Choose Wisely: An Extensive Evaluation of Model Selection for Anomaly Detection in Time Series." Proceedings of the VLDB Endowment 16.11 (2023): 3418-3432.
 
